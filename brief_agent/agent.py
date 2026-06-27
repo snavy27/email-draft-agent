@@ -52,6 +52,8 @@ from .prompt import (
     OUTPUT_CONTRACT,
     SYSTEM_PROMPT_NOTION,
     SYSTEM_PROMPT_NOTION_MEETING,
+    SYSTEM_PROMPT_NOTION_MEETING_WEB,
+    SYSTEM_PROMPT_NOTION_WEB,
 )
 
 DEFAULT_MODEL = "opus"
@@ -133,6 +135,11 @@ _CAL_WRITE_SET = set(CALENDAR_WRITE_TOOLS)
 ALL_WRITE_TOOLS = NOTION_WRITE_TOOLS + CALENDAR_WRITE_TOOLS
 _ALL_WRITE_SET = _WRITE_TOOL_SET | _CAL_WRITE_SET
 
+# Phase 5: built-in read-only web tools, used only by the web-research sub-agent in web.py.
+# There are no web WRITE tools to deny — web access is read-only by nature — but the web
+# sub-agent still hard-denies every Notion/Calendar write, so the zero-writes gate holds.
+WEB_READ_TOOLS = ["WebSearch", "WebFetch"]
+
 
 @dataclass
 class MeetingHint:
@@ -166,6 +173,10 @@ class BriefResult:
     # Phase 4: which calendar event this brief came from, and how it was rendered.
     event_id: str | None = None
     status: str = "briefed"  # "briefed" | "stub" (no CRM match) | "skipped" (internal)
+    # Phase 5: web enrichment. `web_sources` = items offered to the draft (each with a URL);
+    # `web_cited` = those URLs actually present on the brief's Sources line.
+    web_sources: list = field(default_factory=list)
+    web_cited: list = field(default_factory=list)
 
     @property
     def wrote_to_notion(self) -> bool:
@@ -464,7 +475,12 @@ async def _tighten(brief: str, words: int, model: str, target: int = _RETRY_TARG
 
 
 async def draft_brief(
-    target: str, model: str = DEFAULT_MODEL, *, meeting: MeetingHint | None = None
+    target: str,
+    model: str = DEFAULT_MODEL,
+    *,
+    meeting: MeetingHint | None = None,
+    web_context: str | None = None,
+    web_urls: list[str] | None = None,
 ) -> BriefResult:
     """Gather context from Notion for `target` and draft a one-page brief.
 
@@ -475,13 +491,20 @@ async def draft_brief(
         meeting: When provided, draft a Phase 4 calendar brief centered on the specific
             attendee (meeting-aware system prompt + task template). When None, behaviour is
             exactly the Phase 2 single-name brief.
+        web_context: Phase 5. A pre-formatted WEB CONTEXT block (company-level news with source
+            URLs, from `web.format_web_context`). When present alongside `web_urls`, the draft
+            uses the web-aware system prompt and folds cited items into "What's changed". When
+            None/empty, behaviour is byte-for-byte the non-web path (baselines unchanged).
+        web_urls: the source URLs offered to the draft — used to detect which were actually
+            cited (`BriefResult.web_cited`) and, by callers, to reject invented URLs.
 
     Returns:
-        A BriefResult with the brief text and an audit trail (tool calls, retry,
-        unresolved flag, body word count, and — for meeting briefs — the calendar event id).
+        A BriefResult with the brief text and an audit trail (tool calls, retry, unresolved
+        flag, body word count, calendar event id, and the web URLs the brief cited).
     """
+    web_on = bool(web_context and web_urls)
     if meeting is not None:
-        system_prompt = SYSTEM_PROMPT_NOTION_MEETING
+        system_prompt = SYSTEM_PROMPT_NOTION_MEETING_WEB if web_on else SYSTEM_PROMPT_NOTION_MEETING
         task_prompt = NOTION_MEETING_TASK_TEMPLATE.format(
             title=meeting.title,
             when=meeting.when,
@@ -491,8 +514,10 @@ async def draft_brief(
             description=meeting.description or "(none)",
         )
     else:
-        system_prompt = SYSTEM_PROMPT_NOTION
+        system_prompt = SYSTEM_PROMPT_NOTION_WEB if web_on else SYSTEM_PROMPT_NOTION
         task_prompt = NOTION_TASK_TEMPLATE.format(target=target)
+    if web_on:
+        task_prompt += "\n\n" + web_context
 
     brief, tool_calls, sources = await _agentic_draft(
         model, system_prompt=system_prompt, task_prompt=task_prompt
@@ -529,6 +554,10 @@ async def draft_brief(
         if os.environ.get("BRIEF_DEBUG"):
             print(f"  [length-retry] -> {words} words; next target {target}", file=sys.stderr)
 
+    # Which of the offered web URLs the brief actually cited (for the sidecar + the callers'
+    # "no invented URL" check). Only URLs we offered count as cited.
+    web_cited = [u for u in (web_urls or []) if u in brief] if web_on else []
+
     return BriefResult(
         text=brief,
         tool_calls=tool_calls,
@@ -538,4 +567,5 @@ async def draft_brief(
         sources=sources,
         event_id=meeting.event_id if meeting else None,
         status="briefed",
+        web_cited=web_cited,
     )

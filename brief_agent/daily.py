@@ -21,6 +21,7 @@ from .agent import (
     draft_brief,
 )
 from .calendar import CalEvent
+from .web import format_web_context, gather_web_news
 
 _MAX_CONCURRENCY = 3  # cap concurrent per-meeting drafts (matches the eval suite)
 
@@ -40,6 +41,8 @@ class PacketItem:
     body_words: int = 0
     retried: bool = False
     tool_calls: list[str] = field(default_factory=list)
+    web_sources: list = field(default_factory=list)  # web items offered (Phase 5)
+    web_cited: list = field(default_factory=list)     # web URLs the brief actually cited
 
 
 @dataclass
@@ -107,8 +110,11 @@ def _prepend_meeting_time(brief: str, when: str) -> str:
     return brief  # no metadata line found — leave untouched
 
 
-def _item_sources(result_sources: dict, event_id: str, status: str) -> dict:
-    """Provenance record for the sidecar: event id + the Notion pages used."""
+def _item_sources(
+    result_sources: dict, event_id: str, status: str,
+    web_sources: list | None = None, web_cited: list | None = None,
+) -> dict:
+    """Provenance record for the sidecar: event id + Notion pages (CRM) + web sources."""
     src = result_sources or {}
     return {
         "event_id": event_id,
@@ -116,6 +122,8 @@ def _item_sources(result_sources: dict, event_id: str, status: str) -> dict:
         "account": src.get("account"),
         "contacts": src.get("contacts", []),
         "meetings": src.get("meetings", []),
+        "web": web_sources or [],          # company-level news offered to the draft
+        "web_cited": web_cited or [],      # the URLs actually cited in the brief
     }
 
 
@@ -135,38 +143,55 @@ def _hint(event: CalEvent) -> MeetingHint:
     )
 
 
-async def _brief_one(event: CalEvent, model: str, sem: asyncio.Semaphore) -> PacketItem:
-    """Draft one external event into a PacketItem (full brief, or stub on no CRM match)."""
+async def _brief_one(
+    event: CalEvent, model: str, sem: asyncio.Semaphore, enable_web: bool
+) -> PacketItem:
+    """Draft one external event into a PacketItem (full brief, or stub on no CRM match).
+
+    When `enable_web`, first gathers company-level web news (read-only) and injects it into the
+    draft. Web tool calls are returned in the item's tool_calls so the packet's zero-writes
+    assertion covers them. A no-CRM-match event becomes a stub and the web context is discarded
+    (no resolved account to attach company news to).
+    """
     a = event.attendee or {}
+    web_calls: list[str] = []
+    web_sources: list = []
+    web_ctx = web_urls = None
     async with sem:
-        result = await draft_brief(event.company_token, model=model, meeting=_hint(event))
+        if enable_web:
+            items, web_calls = await gather_web_news(event.company_token, model)
+            web_sources = [it.to_dict() for it in items]
+            if items:
+                web_ctx = format_web_context(items)
+                web_urls = [it.url for it in items]
+        result = await draft_brief(
+            event.company_token, model=model, meeting=_hint(event),
+            web_context=web_ctx, web_urls=web_urls,
+        )
 
     if result.unresolved:
         # Agent could not resolve the account/person → deterministic calendar-only stub.
+        # Web is company-level enrichment for a RESOLVED account, so it is dropped here.
         return PacketItem(
-            event_id=event.id,
-            title=event.title,
-            when=event.when_str(),
-            status="stub",
-            sort_key=event.sort_key(),
-            person=a.get("name"),
+            event_id=event.id, title=event.title, when=event.when_str(),
+            status="stub", sort_key=event.sort_key(), person=a.get("name"),
             text=_stub_brief(event),
             sources=_item_sources(result.sources, event.id, "stub"),
-            tool_calls=result.tool_calls,
+            tool_calls=result.tool_calls + web_calls,
         )
 
     return PacketItem(
-        event_id=event.id,
-        title=event.title,
-        when=event.when_str(),
-        status="briefed",
-        sort_key=event.sort_key(),
-        person=a.get("name"),
+        event_id=event.id, title=event.title, when=event.when_str(),
+        status="briefed", sort_key=event.sort_key(), person=a.get("name"),
         text=_prepend_meeting_time(result.text, event.when_str()),
-        sources=_item_sources(result.sources, event.id, "briefed"),
+        sources=_item_sources(
+            result.sources, event.id, "briefed", web_sources, result.web_cited
+        ),
         body_words=result.body_words,
         retried=result.retried,
-        tool_calls=result.tool_calls,
+        tool_calls=result.tool_calls + web_calls,
+        web_sources=web_sources,
+        web_cited=result.web_cited,
     )
 
 
@@ -175,12 +200,14 @@ async def run_daily_briefing(
     model: str = DEFAULT_MODEL,
     *,
     fetch_tool_calls: list[str] | None = None,
+    enable_web: bool = False,
 ) -> DayPacket:
     """Batch the per-meeting engine over a day's (already-parsed) events.
 
     `fetch_tool_calls` lets the caller fold the calendar-read agent's tool calls into the
-    packet's zero-writes accounting. `events` must be the output of `calendar.parse_events`
-    (sorted by start time).
+    packet's zero-writes accounting. `enable_web` turns on Phase 5 company-news enrichment
+    (default OFF so the deterministic eval path never hits the network). `events` must be the
+    output of `calendar.parse_events` (sorted by start time).
     """
     day = events[0].start.date() if events else date.today()
 
@@ -198,7 +225,7 @@ async def run_daily_briefing(
 
     external = [e for e in events if not e.is_internal]
     sem = asyncio.Semaphore(_MAX_CONCURRENCY)
-    items = await asyncio.gather(*(_brief_one(e, model, sem) for e in external))
+    items = await asyncio.gather(*(_brief_one(e, model, sem, enable_web) for e in external))
     items = sorted(items, key=lambda i: i.sort_key)
 
     tool_calls = list(fetch_tool_calls or [])

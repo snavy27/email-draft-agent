@@ -19,6 +19,7 @@ from pathlib import Path
 from .agent import DEFAULT_MODEL, draft_brief
 from .calendar import fetch_day_events, parse_events, resolve_date
 from .daily import render_packet, run_daily_briefing
+from .web import format_web_context, gather_web_news
 
 
 def _sidecar_path(out_path: Path) -> Path:
@@ -49,6 +50,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="With --calendar: today | tomorrow (default) | YYYY-MM-DD.",
     )
     parser.add_argument(
+        "--no-web",
+        action="store_true",
+        help="Disable Phase 5 web enrichment of 'What's changed' (web is on by default).",
+    )
+    parser.add_argument(
         "--out",
         "-o",
         default=None,
@@ -69,13 +75,32 @@ def _build_parser() -> argparse.ArgumentParser:
 # --------------------------------------------------------------------------- #
 # Single-brief mode (Phase 2) — unchanged behaviour
 # --------------------------------------------------------------------------- #
+async def _draft_single(args):
+    """Gather web (unless disabled) then draft the single brief. Returns (result, web_items)."""
+    web_items, web_calls = [], []
+    web_ctx = web_urls = None
+    if not args.no_web:
+        items, web_calls = await gather_web_news(args.target, args.model)
+        web_items = [it.to_dict() for it in items]
+        if items:
+            web_ctx = format_web_context(items)
+            web_urls = [it.url for it in items]
+    result = await draft_brief(
+        args.target, model=args.model, web_context=web_ctx, web_urls=web_urls
+    )
+    result.tool_calls = list(result.tool_calls) + web_calls
+    result.web_sources = web_items
+    return result
+
+
 def _run_single(args) -> int:
     print(
-        f"Gathering context from Notion for '{args.target}' using model '{args.model}'…",
+        f"Gathering context from Notion for '{args.target}' using model '{args.model}'"
+        f"{'' if args.no_web else ' (+ web news)'}…",
         file=sys.stderr,
     )
     try:
-        result = asyncio.run(draft_brief(args.target, model=args.model))
+        result = asyncio.run(_draft_single(args))
     except Exception as exc:  # surface SDK / model / MCP errors cleanly
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -83,11 +108,13 @@ def _run_single(args) -> int:
     out_path = Path(args.out or "brief.md")
     out_path.write_text(result.text + "\n", encoding="utf-8")
 
-    # Provenance sidecar: the real Notion page URLs the agent fetched, categorised by
-    # source database. The brief's CEO-facing Sources line stays readable page names;
-    # this JSON is the machine-checkable audit trail.
+    # Provenance sidecar: the real Notion page URLs the agent fetched (CRM) plus any web
+    # sources offered and which were cited. The brief's CEO-facing Sources line stays readable.
     sidecar = _sidecar_path(out_path)
-    provenance = {"target": args.target, "model": args.model, **result.sources}
+    provenance = {
+        "target": args.target, "model": args.model, **result.sources,
+        "web": result.web_sources, "web_cited": result.web_cited,
+    }
     sidecar.write_text(
         json.dumps(provenance, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
@@ -111,6 +138,11 @@ def _run_single(args) -> int:
         f"{' (unresolved — not padded)' if result.unresolved else ''}.",
         file=sys.stderr,
     )
+    if not args.no_web:
+        print(
+            f"Web news: {len(result.web_sources)} found, {len(result.web_cited)} cited.",
+            file=sys.stderr,
+        )
     if result.made_any_write:
         print("ERROR: a WRITE tool was called — this should never happen.", file=sys.stderr)
         return 1
@@ -125,7 +157,7 @@ async def _build_packet(args, day):
     raw, fetch_calls = await fetch_day_events(day, args.model)
     events = parse_events(raw)
     packet = await run_daily_briefing(
-        events, model=args.model, fetch_tool_calls=fetch_calls
+        events, model=args.model, fetch_tool_calls=fetch_calls, enable_web=not args.no_web
     )
     return packet
 

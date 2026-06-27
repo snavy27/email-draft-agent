@@ -1,11 +1,12 @@
 """Phase 4 calendar eval cases — MOCKED calendar payloads (no live calendar).
 
-`DAY_EVENTS` mirrors the shape `list_events` returns (and the real seeded 2026-06-29 day),
-but is hand-built so the suite is deterministic. Attendee emails use the `@company.example.com`
-test form on purpose — the engine must match the CRM contact by name + company root, not by the
-literal address (the CRM stores `@company.com`).
+`DAY_EVENTS` mirrors the shape `list_events` returns, hand-built so the suite is deterministic.
+Attendee emails use the `@company.example.com` test form on purpose — the engine must match the
+CRM contact by name + company root, not by the literal address.
 
-Events are listed OUT OF start-time order so ordering is actually exercised.
+The CRM accounts are now real public-company names (Target Corporation, Verizon, Atlassian,
+Teladoc Health, …); the CONTACTS (Sarah Chen, Greg Sullivan, Priya Nair, Marcus Reed, …) remain
+fictional. Events are listed OUT OF start-time order so ordering is actually exercised.
 """
 
 _SELF = {"email": "shardanavalika@gmail.com", "self": True, "organizer": True}
@@ -29,14 +30,14 @@ def _ext(name, email):
 
 
 # --- the mocked day (unsorted on purpose) ---------------------------------- #
-EV_BRIGHTLINE = _ev(
-    "ev-brightline", "Compliance deep-dive — Brightline Health", "15", "15:30",
-    [_SELF, _ext("Marcus Reed", "marcus.reed@brightlinehealth.example.com")],
+EV_TELADOC = _ev(
+    "ev-teladoc", "Compliance deep-dive — Teladoc Health", "15", "15:30",
+    [_SELF, _ext("Marcus Reed", "marcus.reed@teladochealth.example.com")],
     "Security and HIPAA review.",
 )
-EV_MERIDIAN = _ev(
-    "ev-meridian", "Renewal sync — Meridian Retail", "09", "09:30",
-    [_SELF, _ext("Sarah Chen", "sarah.chen@meridianretail.example.com")],
+EV_TARGET = _ev(
+    "ev-target", "Renewal sync — Target Corporation", "09", "09:30",
+    [_SELF, _ext("Sarah Chen", "sarah.chen@target.example.com")],
     "Quarterly renewal check-in ahead of the September renewal.",
 )
 EV_STANDUP = _ev(
@@ -44,9 +45,9 @@ EV_STANDUP = _ev(
     [_SELF],
     "Weekly internal pipeline review. No external attendees.",
 )
-EV_ORBIT = _ev(
-    "ev-orbit", "Reliability review — Orbit Telecom", "10", "10:30",
-    [_SELF, _ext("Greg Sullivan", "greg.sullivan@orbittelecom.example.com")],
+EV_VERIZON = _ev(
+    "ev-verizon", "Reliability review — Verizon", "10", "10:30",
+    [_SELF, _ext("Greg Sullivan", "greg.sullivan@verizon.example.com")],
     "Review reliability improvement plan after Q2 outages.",
 )
 EV_QUANTUM = _ev(
@@ -54,29 +55,29 @@ EV_QUANTUM = _ev(
     [_SELF, _ext("Jane Doe", "jane.doe@quantumrobotics.example.com")],
     "First exploratory call with a new inbound prospect (not in CRM).",
 )
-EV_COBALT = _ev(
-    "ev-cobalt", "Expansion chat — Cobalt Software", "14", "14:30",
-    [_SELF, _ext("Priya Nair", "priya.nair@cobaltsoftware.example.com")],
+EV_ATLASSIAN = _ev(
+    "ev-atlassian", "Expansion chat — Atlassian", "14", "14:30",
+    [_SELF, _ext("Priya Nair", "priya.nair@atlassian.example.com")],
     "Discuss expansion to two sister teams (~40 seats).",
 )
 
-DAY_EVENTS = [EV_BRIGHTLINE, EV_MERIDIAN, EV_STANDUP, EV_ORBIT, EV_QUANTUM, EV_COBALT]
+DAY_EVENTS = [EV_TELADOC, EV_TARGET, EV_STANDUP, EV_VERIZON, EV_QUANTUM, EV_ATLASSIAN]
 
 # Expected packet shape for the full day.
 DAY_EXPECTED = {
     "total": 6,
-    "briefed": 4,   # Meridian, Orbit, Cobalt, Brightline
+    "briefed": 4,   # Target, Verizon, Atlassian, Teladoc
     "stub": 1,      # Quantum Robotics (no CRM match)
     "skipped": 1,   # internal standup
     # briefed+stub items, in start order:
-    "item_order": ["ev-meridian", "ev-orbit", "ev-quantum", "ev-cobalt", "ev-brightline"],
+    "item_order": ["ev-target", "ev-verizon", "ev-quantum", "ev-atlassian", "ev-teladoc"],
 }
 
 # A deliberately-small 3-event day for the structural order+counts case (d).
-THREE_EVENT_DAY = [EV_QUANTUM, EV_STANDUP, EV_ORBIT]  # unsorted
+THREE_EVENT_DAY = [EV_QUANTUM, EV_STANDUP, EV_VERIZON]  # unsorted
 THREE_EVENT_EXPECTED = {
     "total": 3, "briefed": 1, "stub": 1, "skipped": 1,
-    "item_order": ["ev-orbit", "ev-quantum"],
+    "item_order": ["ev-verizon", "ev-quantum"],
 }
 
 
@@ -85,32 +86,32 @@ THREE_EVENT_EXPECTED = {
 # same account who must NOT become the primary subject (may appear only as background).
 ACCOUNT_CASES = [
     {
-        "id": "meridian", "event_id": "ev-meridian", "company": "Meridian Retail",
+        "id": "target", "event_id": "ev-target", "company": "Target Corporation",
         "attendee": "Sarah Chen", "wrong_person": None,
         "when_token": "29 Jun 2026, 09:00",
         "must_appear": ["Sarah Chen", "renewal"],
-        "must_not_appear": ["Greg Sullivan", "Orbit Telecom"],
+        "must_not_appear": ["Greg Sullivan", "Verizon"],
     },
     {
-        "id": "orbit", "event_id": "ev-orbit", "company": "Orbit Telecom",
+        "id": "verizon", "event_id": "ev-verizon", "company": "Verizon",
         "attendee": "Greg Sullivan", "wrong_person": "Dana Cole",
         "when_token": "29 Jun 2026, 10:00",
         "must_appear": ["Greg Sullivan"],
-        "must_not_appear": ["Meridian", "Sarah Chen"],
+        "must_not_appear": ["Sarah Chen", "Priya Nair"],
     },
     {
-        "id": "cobalt", "event_id": "ev-cobalt", "company": "Cobalt Software",
+        "id": "atlassian", "event_id": "ev-atlassian", "company": "Atlassian",
         "attendee": "Priya Nair", "wrong_person": "Mark Lin",
         "when_token": "29 Jun 2026, 14:00",
         "must_appear": ["Priya Nair"],
-        "must_not_appear": ["Meridian", "Greg Sullivan"],
+        "must_not_appear": ["Sarah Chen", "Greg Sullivan"],
     },
     {
-        "id": "brightline", "event_id": "ev-brightline", "company": "Brightline Health",
+        "id": "teladoc", "event_id": "ev-teladoc", "company": "Teladoc Health",
         "attendee": "Marcus Reed", "wrong_person": "Aisha Bello",
         "when_token": "29 Jun 2026, 15:00",
         "must_appear": ["Marcus Reed"],
-        "must_not_appear": ["Orbit Telecom", "Greg Sullivan"],
+        "must_not_appear": ["Verizon", "Greg Sullivan"],
     },
 ]
 

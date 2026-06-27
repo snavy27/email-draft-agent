@@ -169,7 +169,7 @@ async def run_stub_case(case, events_map, model, sem) -> dict:
 # --------------------------------------------------------------------------- #
 # Structural cases (no model): exercise run_daily_briefing's order/counts/skip
 # --------------------------------------------------------------------------- #
-async def _fake_draft(target, model=agent.DEFAULT_MODEL, *, meeting=None):
+async def _fake_draft(target, model=agent.DEFAULT_MODEL, *, meeting=None, web_context=None, web_urls=None):
     """Stand-in engine: 'resolves' everything except a Quantum company (→ unresolved)."""
     company = (meeting.company if meeting else target).lower()
     unresolved = "quantum" in company

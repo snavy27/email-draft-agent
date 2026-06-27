@@ -270,3 +270,40 @@ Resolve the account and identify {person} specifically in the Notion CRM, gather
 instructed, then output ONLY the finished brief — no preface, acknowledgement, or explanation
 before the `# Meeting Brief` title, even if the account or person cannot be resolved. Put any
 such note inside the brief itself (the metadata `Sources:` line and the Bottom line)."""
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — web enrichment for "What's changed" (company-level news ONLY)
+# ---------------------------------------------------------------------------
+# This adds CONTEXT to the EXISTING "What's changed" section. It does NOT add a section, change
+# the format, or become a source of truth for people. Composed onto the gather contract only for
+# web-enabled drafts; the actual news items are injected via the task prompt at draft time.
+WEB_ENRICH_ADDENDUM = """\
+WEB CONTEXT — recent company-level news (provided separately in the task, each item with a real
+source URL). Use it to sharpen ONLY the "What's changed since you last spoke" section:
+
+- Fold in ONLY items that are clearly about THIS account's company AND genuinely recent and
+  material (funding, launches, earnings, M&A, leadership moves, major incidents). Write each as a
+  short bullet a reader can act on.
+- ATTRIBUTION IS MANDATORY. Include a web-derived fact ONLY if one of the provided items supports
+  it, and add that item's source URL to the metadata `Sources:` line. NEVER invent or guess a URL.
+  On the `Sources:` line keep web sources clearly separate from the CRM pages — list the CRM page
+  names first, then a `Web:` segment with the cited URLs (e.g. "… (contacts) · Web: https://…").
+- DO NOT PAD. If no provided item is relevant (or none were provided), add nothing — the brief
+  stands on the CRM alone, and the `Sources:` line has no `Web:` segment.
+- COMPANY-LEVEL ONLY. Never use web context to identify, verify, correct, or describe the PERSON
+  you are meeting — the CRM is the sole source of truth for the contact. Ignore any web item about
+  a different entity that merely shares the company's name.
+- PEOPLE/LEADERSHIP items need care. A leadership change about a DIFFERENT role (e.g. a new CFO
+  when your contact is the VP of Operations) is fine company news. But if a web item names a new
+  person in — or reports a change to — the SAME role or seat as your CRM contact, or claims your
+  contact has left or been replaced, IGNORE it entirely (do not surface it, even as company news).
+  The CRM is the sole source of truth for who you are meeting; never let the web contradict,
+  replace, or "correct" that contact."""
+
+SYSTEM_PROMPT_NOTION_WEB = _compose_system_prompt(
+    _ROLE_NOTION, gather=NOTION_GATHER_CONTRACT + "\n\n" + WEB_ENRICH_ADDENDUM
+)
+SYSTEM_PROMPT_NOTION_MEETING_WEB = _compose_system_prompt(
+    _ROLE_NOTION, gather=NOTION_MEETING_GATHER_CONTRACT + "\n\n" + WEB_ENRICH_ADDENDUM
+)

@@ -7,10 +7,16 @@ that drafts one-page meeting briefs.
 it searches Notion itself, follows the account's Contact and Meeting relations, and drafts the
 brief — read-only, never writing to Notion.
 
-**Phase 4 (current):** *calendar-driven daily packet.* Point it at a day and it reads your
-calendar (read-only), skips internal-only meetings, and drafts one brief per external meeting —
-**centered on the specific person you're meeting**, not just their company. The one-page format is
-unchanged; the calendar context only sharpens the existing sections.
+**Phase 4:** *calendar-driven daily packet.* Point it at a day and it reads your calendar
+(read-only), skips internal-only meetings, and drafts one brief per external meeting — **centered
+on the specific person you're meeting**, not just their company.
+
+**Phase 5 (current):** *web enrichment.* Before drafting, a read-only web sub-agent gathers recent
+**company-level** news (funding, launches, earnings, M&A, leadership moves, major incidents; ~last
+6 months) and folds only relevant, **source-cited** items into the existing "What's changed"
+section. Web is never used to identify or correct the person you're meeting — the CRM stays the
+sole source of truth for contacts — and a web fact appears only if a fetched source URL supports
+it (otherwise it's omitted; the brief never pads). The one-page format is unchanged.
 
 ## Requirements
 
@@ -49,6 +55,8 @@ python main.py --calendar --date 2026-06-29 --out day.md
 - `--calendar` — read the calendar for a day and brief every external meeting.
 - `--date` — `today` | `tomorrow` (default) | `YYYY-MM-DD`.
 - `--out` — output path (defaults to `day.md` in calendar mode).
+- `--no-web` — disable web enrichment (web is **on by default** in both modes). The Sources line
+  keeps CRM page names and a separate `Web:` segment for any cited article URLs.
 
 The packet leads with a header (`N meetings · X briefed / Y unresolved / Z skipped`), lists the
 skipped internal meetings, then the briefs in start-time order. Internal-only meetings (no
@@ -92,12 +100,18 @@ In calendar mode, `brief_agent/calendar.py` reads the day's events (read-only) a
 into one packet. A meeting-aware gather (`SYSTEM_PROMPT_NOTION_MEETING` in `prompt.py`) centers
 each brief on the specific attendee — the output format is identical to Phase 2.
 
+Web enrichment (`brief_agent/web.py`) is a separate read-only sub-agent (`WebSearch`/`WebFetch`)
+that returns structured, URL-bearing news items; the orchestrator injects them as WEB CONTEXT into
+the draft, which folds only relevant, cited items into "What's changed". Keeping web behind one
+Python function lets the eval suite mock it for a deterministic gate (`eval/run_eval_web.py`) while
+production uses the real tools (`tests/test_web_smoke.py` covers the live path, non-gating).
+
 ### Read-only safety
 
-- `allowed_tools` is whitelisted to `notion-search`/`notion-fetch` (and, for the calendar
-  adapter, the calendar list/get tools) only.
+- `allowed_tools` is whitelisted to `notion-search`/`notion-fetch` (calendar adapter: the calendar
+  list/get tools; web sub-agent: `WebSearch`/`WebFetch`) — all read-only.
 - Every Notion **and** Calendar write tool is in `disallowed_tools` as well — defense in depth.
-  The agent can never modify Notion or the calendar.
+  The agent can never modify Notion or the calendar (web access is read-only by nature).
 - `permission_mode="dontAsk"` denies anything not allow-listed without prompting (non-interactive).
 - `BriefResult.made_any_write` / `DayPacket.made_any_write` are asserted `False`; the CLI and both
   eval suites error out if any write to either connector is ever seen.

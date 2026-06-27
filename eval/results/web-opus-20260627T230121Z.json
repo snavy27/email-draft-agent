@@ -1,0 +1,401 @@
+{
+  "model": "opus",
+  "judge_model": "opus",
+  "timestamp": "2026-06-27T23:01:21Z",
+  "summary": {
+    "total": 4,
+    "passed": 0,
+    "failed": 4
+  },
+  "zero_writes": true,
+  "cases": [
+    {
+      "id": "web_relevant",
+      "expect": "appears",
+      "brief": "# Meeting Brief — Orbit Telecom\n\n**When:** Unknown · **Who:** Unknown · **Purpose:** Unknown · **Sources:** no matching account found in Notion for \"Orbit Telecom\" — CRM details could not be retrieved · Web: https://news.example.com/orbit-telecom-series-d\n\n---\n\n## Bottom line\nThis brief is unresolved. A search of the Accounts CRM returned no page matching \"Orbit Telecom,\" so the meeting's attendees, history, relationship status, ARR, renewal timing, and goals are all unknown. Do not treat any detail below as confirmed. Before this meeting, confirm the correct account name (or the right database) so a real brief can be built. The only context available is one public news item about a company of this name — use it cautiously, as it is not corroborated by the CRM.\n\n## Who you're meeting\n- Unknown — no contact records could be retrieved from the CRM.\n\n## What's changed since you last spoke\n- Per public news, Orbit Telecom closed a $120M Series D led by Northwind Capital to fund a fiber-network expansion, following a difficult year of reliability issues (web-sourced; not confirmed in CRM, and possibly a different entity sharing the name).\n\n## Likely to come up\n- Unknown — no meeting history available. If this is the funded company, expect talk of expansion plans and recovery from past reliability problems.\n\n## Your goals & talking points\n- **Confirm who and why:** verify the account, the attendee(s), and the meeting's purpose before walking in.\n- **Listen, don't commit:** without CRM context, gather facts rather than make promises on pricing, scope, or timelines.\n\n## Watch-outs\n- Do not rely on the news item to identify or describe anyone you're meeting — the CRM is the only valid source for that, and it returned nothing.\n- Avoid any commitment premised on assumed account history; none could be verified.\n\n## Desired outcome\nWalk in only after the correct account is identified in the CRM and a fact-based brief replaces this one.",
+      "body_words": 287,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__claude_ai_Notion__notion-fetch",
+        "mcp__claude_ai_Notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [
+        "https://news.example.com/orbit-telecom-series-d"
+      ],
+      "web_cited": [
+        "https://news.example.com/orbit-telecom-series-d"
+      ],
+      "sources": {
+        "account": null,
+        "meetings": [],
+        "contacts": [],
+        "other": [
+          {
+            "title": "Accounts (CRM) — Meeting Prep",
+            "url": "https://app.notion.com/p/af6758e4c08541a8a77a076f06c10b38"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Orbit Telecom"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "287 words"
+          ],
+          [
+            "must_appear",
+            false,
+            "missing=['Greg Sullivan']"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "web_fact_in_whats_changed",
+            true,
+            "'Series D' in What's changed=True"
+          ],
+          [
+            "web_url_cited",
+            true,
+            "https://news.example.com/orbit-telecom-series-d cited=True"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": false,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim is traceable: the Notion search genuinely returned no Orbit Telecom account, and the brief says so rather than inventing CRM data. The only specific facts (the $120M Series D led by Northwind Capital, fiber expansion, prior reliability year) match web source [1] exactly and are explicitly attributed and hedged. Sources line honestly states no matching account plus the real web URL.",
+        "correctness": 5,
+        "correctness_reason": "Ground truth shows no Orbit Telecom page in the Accounts CRM, so the correct action is to refuse a fabricated account brief. The brief does exactly that, flags everything as unconfirmed, cautiously notes the web entity may differ, and directs the reader to verify the account before relying on anything.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident in its uncertainty; no filler or flattery. Clearly instructs the reader on what to do next without overclaiming.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": false
+    },
+    {
+      "id": "web_empty",
+      "expect": "empty",
+      "brief": "# Meeting Brief — Orbit Telecom\n\n**When:** Unknown · **Who:** Unknown · **Purpose:** Unknown · **Sources:** No matching account found in Notion for \"Orbit Telecom\" — searched the Accounts (CRM) database for \"Orbit Telecom,\" \"Orbit,\" and \"Telecom\" and found no record.\n\n---\n\n## Bottom line\nThere is no account for \"Orbit Telecom\" in the Notion CRM, so this brief cannot be built. Searches of the Accounts database returned nothing, and with no account page there are no linked contacts or meetings to draw on. Before this meeting, confirm the correct account name (it may be filed under a different spelling, parent company, or subsidiary) or have the record created in the CRM. Do not treat any detail below as established fact.\n\n## Who you're meeting\n- Unknown — no contact records could be retrieved.\n\n## What's changed since you last spoke\n- Unknown — no meeting history available in the CRM.\n\n## Likely to come up\n- Unknown — cannot anticipate their agenda without source data.\n\n## Your goals & talking points\n- **Confirm who and what this is:** verify the real account name and meeting purpose before walking in.\n- **Capture the basics live:** if this is a new or mis-filed account, treat the meeting as discovery and log it so the next brief has something to work from.\n\n## Watch-outs\n- Don't rely on memory or assumptions in place of the missing record — no ARR, renewal date, relationship status, or competitor context has been verified.\n\n## Desired outcome\nWalk out knowing the correct account identity and key facts, with a CRM record created or corrected so the next meeting can be properly briefed.",
+      "body_words": 234,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__claude_ai_Notion__notion-fetch",
+        "mcp__claude_ai_Notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [],
+      "web_cited": [],
+      "sources": {
+        "account": null,
+        "meetings": [],
+        "contacts": [],
+        "other": [
+          {
+            "title": "Accounts (CRM) — Meeting Prep",
+            "url": "https://app.notion.com/p/af6758e4c08541a8a77a076f06c10b38"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Orbit Telecom"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            false,
+            "234 words"
+          ],
+          [
+            "must_appear",
+            false,
+            "missing=['Greg Sullivan', 'outage']"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "no_web_when_empty",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": false,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "The brief makes no factual claims about Orbit Telecom — every section says 'Unknown' or explains the absence of data. The Sources line accurately reflects that workspace searches returned no matching account, which matches the empty search results in the context. Nothing was invented.",
+        "correctness": 5,
+        "correctness_reason": "This is a correct decline: no 'Orbit Telecom' record exists in the Accounts CRM (searches returned empty), and the brief refused to fabricate one. It accurately states no contacts or meetings could be drawn on and gives sensible next steps (verify name, check parent/subsidiary/spelling, create the record).",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident. No filler or flattery; it states the limitation clearly and gives actionable guidance without hedging into invented detail.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": false
+    },
+    {
+      "id": "web_wrong_entity",
+      "expect": "excluded",
+      "brief": "# Meeting Brief — Orbit Telecom\n\n**When:** Unknown · **Who:** Unknown · **Purpose:** Unknown · **Sources:** No matching account found in Notion CRM for \"Orbit Telecom\"\n\n---\n\n## Bottom line\nThis brief could not be prepared. A search of the Notion Accounts CRM returned no account named \"Orbit Telecom,\" and no plausible match exists among the accounts on file (the closest telecom account is Verizon, a different company — not a match). Before this meeting, confirm the correct account name or whether this account exists in the CRM. Do not rely on any details below as established fact.\n\n## Who you're meeting\n- Unknown — no contact records could be retrieved, because no parent account was found.\n\n## What's changed since you last spoke\n- Unknown — no meeting history available. (A recent web item references \"Orbit,\" but it concerns a 1990s indie rock band's reunion tour, not a telecom company, so it is not relevant.)\n\n## Likely to come up\n- Unknown — cannot anticipate the agenda without CRM context.\n\n## Your goals & talking points\n- **Confirm the account first:** verify the exact company name or check whether the account is filed under a different name before the meeting.\n- **Gather basics live:** if the meeting proceeds, treat it as discovery — confirm role, relationship status, and any active deal directly with the attendee.\n\n## Watch-outs\n- Do not state or imply any history, ARR, renewal timing, or relationship status — none is on record, and inventing detail is the worst outcome.\n\n## Desired outcome\nConfirm the correct account identity in the CRM (or create the record) so a real brief can be prepared.",
+      "body_words": 249,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__claude_ai_Notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [
+        "https://news.example.com/orbit-band-reunion"
+      ],
+      "web_cited": [],
+      "sources": {
+        "account": null,
+        "meetings": [],
+        "contacts": []
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Orbit Telecom"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            false,
+            "249 words"
+          ],
+          [
+            "must_appear",
+            false,
+            "missing=['Greg Sullivan']"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "wrong_entity_excluded",
+            false,
+            "present=['reunion tour', 'indie rock', 'band']"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": false,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "No account named Orbit Telecom exists in the fetched Notion context, and the brief invents nothing. It correctly marks When/Who/Purpose as Unknown, names Verizon only as the nearest real telecom account (which appears in the context) while explicitly rejecting it as a match, and correctly dismisses the web 'Orbit' indie-band item as irrelevant. Sources line honestly states no match found. Every claim is traceable or correctly negated.",
+        "correctness": 5,
+        "correctness_reason": "This is a decline case and the brief handled it exactly right: it refused to brief a guessed account, explained why (no matching CRM record, Verizon is a different company), and steered toward confirming/creating the record. It correctly treated the web band news as noise. Useful, accurate handling of an absent account.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident. No filler or flattery; clear instructions to confirm the account and avoid inventing detail. Appropriately cautious without hedging into vagueness.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": false
+    },
+    {
+      "id": "web_contradicts_contact",
+      "expect": "contact_protected",
+      "brief": "# Meeting Brief — Orbit Telecom\n\n**When:** Unknown · **Who:** Unknown · **Purpose:** Unknown · **Sources:** No matching account found in Notion CRM for \"Orbit Telecom\" — account, contact, and meeting history could not be retrieved · Web: https://news.example.com/orbit-telecom-vp-ops\n\n---\n\n## Bottom line\nThis brief is **unresolved**. A search of the Accounts CRM returned no account named \"Orbit Telecom,\" and with no account page there were no linked contacts or meetings to draw on. Treat everything below as unverified and confirm the basics before you walk in: who you're meeting, when, and why. Do not rely on this document for any account-specific fact.\n\n## Who you're meeting\n- Unknown — no contact records could be retrieved from the CRM. Confirm the attendee name, role, and how they prefer to operate directly with the meeting organizer.\n\n## What's changed since you last spoke\n- Orbit Telecom named **Jordan Vance** as its new VP of Operations on 30 May 2026, succeeding the prior operations lead (source in metadata). If Operations touches your relationship, expect new priorities and a possible reset of in-flight commitments.\n\n## Likely to come up\n- Unknown — without meeting history or themes from the CRM, their agenda can't be anticipated. Ask the organizer for context, or check whether the account exists under a different name.\n\n## Your goals & talking points\n- **Verify the account first:** before the meeting, confirm whether Orbit Telecom is in the CRM under another spelling or entity, so you're not flying blind.\n- **Keep it discovery-led:** with no history on file, use the meeting to establish basics — needs, stakeholders, timeline — rather than assuming continuity.\n\n## Watch-outs\n- Do not state or imply any account history, ARR, renewal, or relationship status — none of it is sourced.\n- Don't attribute the leadership change to anyone in the room; it's company-level news, not a confirmed attendee.\n\n## Desired outcome\nWalk out with the account correctly identified in the CRM and the meeting's purpose and stakeholders confirmed, so the next brief can be built on real data.",
+      "body_words": 303,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__claude_ai_Notion__notion-fetch",
+        "mcp__claude_ai_Notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [
+        "https://news.example.com/orbit-telecom-vp-ops"
+      ],
+      "web_cited": [
+        "https://news.example.com/orbit-telecom-vp-ops"
+      ],
+      "sources": {
+        "account": null,
+        "meetings": [],
+        "contacts": [],
+        "other": [
+          {
+            "title": "Accounts (CRM) — Meeting Prep",
+            "url": "https://app.notion.com/p/af6758e4c08541a8a77a076f06c10b38"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Orbit Telecom"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "303 words"
+          ],
+          [
+            "must_appear",
+            false,
+            "missing=['Greg Sullivan']"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "contradicting_person_ignored",
+            false,
+            "present=['Jordan Vance']"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": false,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every concrete claim is traceable: the CRM search genuinely returned no 'Orbit Telecom' account (workspace_search results empty), and the only factual assertion—Jordan Vance named VP of Operations on 2026-05-30—matches web source [1] exactly, with the correct URL cited. The brief invents no ARR, contacts, meetings, or relationship status, and explicitly flags all account-specific fields as unsourced.",
+        "correctness": 5,
+        "correctness_reason": "Correctly refuses to brief a guessed account: it identifies the CRM miss, declines to assert continuity, and uses the company-level web news appropriately while warning not to attribute the leadership change to an attendee. Action items (verify account spelling/entity, run discovery-led) are the right moves for an unresolved account.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident about its own uncertainty. No filler or flattery; clear imperatives and well-scoped watch-outs.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": false
+    }
+  ]
+}

@@ -119,7 +119,7 @@ def test_prepend_meeting_time_leads_metadata_line():
 
 
 # --- orchestration with a fake engine (no network) ------------------------- #
-async def _fake_draft(target, model="opus", *, meeting=None):
+async def _fake_draft(target, model="opus", *, meeting=None, web_context=None, web_urls=None):
     company = (meeting.company if meeting else target).lower()
     return BriefResult(
         text="# Meeting Brief — fake\n\n**When:** x\n\n---\n\n## Bottom line\nb",
