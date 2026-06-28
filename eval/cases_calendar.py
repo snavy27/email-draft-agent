@@ -80,6 +80,19 @@ THREE_EVENT_EXPECTED = {
     "item_order": ["ev-verizon", "ev-quantum"],
 }
 
+# Phase 8: partial-failure isolation. With a fake engine forced to ERROR on Verizon, that one
+# meeting becomes a `failed` item while the rest of the day still ships — no exception propagates.
+PARTIAL_FAIL_DAY = [EV_VERIZON, EV_QUANTUM, EV_STANDUP, EV_ATLASSIAN]  # unsorted
+PARTIAL_FAIL_EXPECTED = {
+    "total": 4,
+    "briefed": 1,   # Atlassian
+    "stub": 1,      # Quantum Robotics
+    "failed": 1,    # Verizon (forced error) — isolated
+    "skipped": 1,   # internal standup
+    "item_order": ["ev-verizon", "ev-quantum", "ev-atlassian"],  # start order, failure included
+    "failed_event": "ev-verizon",
+}
+
 
 # --- per-brief grading specs ----------------------------------------------- #
 # Account cases: full person-centered briefs. `wrong_person` is the other CRM contact at the

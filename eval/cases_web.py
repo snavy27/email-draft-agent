@@ -1,4 +1,4 @@
-"""Phase 5 web eval cases — MOCKED web payloads (no live network).
+"""Phase 5 / 8 web eval cases — MOCKED web payloads (no live network).
 
 Account-mode cases on Verizon. The account is a REAL company (so its web news is realistic), but
 its CRM contact — Greg Sullivan, VP Operations — is FICTIONAL and is NOT Verizon's real exec. That
@@ -8,12 +8,21 @@ surfaces a real-looking Verizon ops leader, the brief must keep Greg Sullivan as
 URLs use an obvious mock domain — they are never fetched; the grader only checks that any cited
 URL is one we offered.
 
+Recency: `validate_web_items` (Phase 8) drops stale/dateless items before drafting. The eval
+validates against a FIXED reference date `EVAL_NOW` (not the wall clock), so the suite stays
+deterministic — the mock items below are dated within 183 days of EVAL_NOW and survive.
+
 Covers the four required behaviors:
   (a) relevant news        -> folded into "What's changed", cited
   (b) nothing found        -> brief unchanged, no web URL, no padding
   (c) different same-name  -> excluded (no wrong-company contamination)
   (d) contradicts contact  -> ignored (CRM remains the source of truth for people)
 """
+
+from datetime import date
+
+# Fixed "today" for deterministic recency validation in the web eval (NOT the wall clock).
+EVAL_NOW = date(2026, 6, 28)
 
 _RELEVANT = {
     "headline": "Verizon agrees to acquire Frontier Communications' fiber business for $9.6B",

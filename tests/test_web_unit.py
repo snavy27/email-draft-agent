@@ -8,13 +8,23 @@ Run:  python tests/test_web_unit.py     (self-contained)
 """
 
 import sys
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from brief_agent.web import _extract_json_array, _to_items, _valid_url, format_web_context
+from brief_agent.web import (
+    _extract_json_array,
+    _parse_date,
+    _to_items,
+    _valid_url,
+    format_web_context,
+    validate_web_items,
+)
 from eval.cases_web import WEB_CASES
 from eval.graders import programmatic_grade_web
+
+_NOW = date(2026, 6, 28)
 
 _C = {c["id"]: c for c in WEB_CASES}
 _BODY = " ".join(["w"] * 290)
@@ -52,6 +62,52 @@ def test_to_items_drops_urlless_and_bad_scheme():
     assert len(items) == 1
     assert items[0].headline == "Good"
     assert items[0].source == "reuters.com"
+
+
+# --- Phase 8: recency grounding gate (validate_web_items) ------------------ #
+def test_parse_date_iso_and_yyyy_mm():
+    assert _parse_date("2026-05-12") == date(2026, 5, 12)
+    assert _parse_date("2026-05") == date(2026, 5, 1)
+    assert _parse_date("") is None
+    assert _parse_date("last week") is None
+    assert _parse_date("2026-13-40") is None
+
+
+def test_validate_keeps_recent_item_with_url():
+    raw = [{"headline": "Recent", "url": "https://reuters.com/x", "date": "2026-05-12"}]
+    items = validate_web_items(raw, now=_NOW, max_age_days=183)
+    assert len(items) == 1 and items[0].headline == "Recent"
+
+
+def test_validate_drops_stale_item():
+    raw = [{"headline": "Old news", "url": "https://reuters.com/x", "date": "2025-01-01"}]
+    assert validate_web_items(raw, now=_NOW, max_age_days=183) == []
+
+
+def test_validate_drops_item_without_url():
+    raw = [{"headline": "No URL", "url": "", "date": "2026-06-01"}]
+    assert validate_web_items(raw, now=_NOW) == []
+
+
+def test_validate_drops_item_without_parseable_date():
+    raw = [{"headline": "Dateless", "url": "https://reuters.com/x", "date": ""}]
+    assert validate_web_items(raw, now=_NOW) == []
+    raw2 = [{"headline": "Vague", "url": "https://reuters.com/x", "date": "recently"}]
+    assert validate_web_items(raw2, now=_NOW) == []
+
+
+def test_validate_tolerates_small_future_skew_but_drops_far_future():
+    near = [{"headline": "Today-ish", "url": "https://reuters.com/x",
+             "date": "2026-06-29"}]  # +1 day, within skew
+    assert len(validate_web_items(near, now=_NOW)) == 1
+    far = [{"headline": "Future", "url": "https://reuters.com/x", "date": "2026-12-01"}]
+    assert validate_web_items(far, now=_NOW) == []
+
+
+def test_validate_window_is_configurable():
+    raw = [{"headline": "3mo old", "url": "https://reuters.com/x", "date": "2026-03-10"}]
+    assert len(validate_web_items(raw, now=_NOW, max_age_days=183)) == 1  # within 6mo
+    assert validate_web_items(raw, now=_NOW, max_age_days=30) == []        # outside 1mo
 
 
 def test_extract_json_array_tolerant():

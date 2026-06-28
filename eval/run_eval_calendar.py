@@ -37,6 +37,8 @@ from eval.cases_calendar import (
     ACCOUNT_CASES,
     DAY_EVENTS,
     DAY_EXPECTED,
+    PARTIAL_FAIL_DAY,
+    PARTIAL_FAIL_EXPECTED,
     STUB_CASE,
     THREE_EVENT_DAY,
     THREE_EVENT_EXPECTED,
@@ -200,6 +202,42 @@ async def run_structural_case(label, events, expected) -> dict:
     return {"id": label, "type": "structural", "checks": checks, "overall_pass": passed}
 
 
+async def _fake_draft_partial_fail(target, model=agent.DEFAULT_MODEL, *, meeting=None, web_context=None, web_urls=None):
+    """Like _fake_draft, but ERRORS on Verizon — to exercise per-meeting failure isolation."""
+    company = (meeting.company if meeting else target).lower()
+    if "verizon" in company:
+        raise RuntimeError("forced resolve failure")
+    text = (
+        "# Meeting Brief — fake\n\n**When:** x · **Who:** y · **Purpose:** z · **Sources:** s\n\n"
+        "---\n\n## Bottom line\nfake body"
+    )
+    return BriefResult(
+        text=text, unresolved=("quantum" in company),
+        event_id=meeting.event_id if meeting else None,
+    )
+
+
+async def run_partial_failure_case(label, events, expected) -> dict:
+    """Structural (no model): one meeting errors → packet ships the rest + 1 failed note, 0 writes."""
+    checks: list[tuple[str, bool, str]] = []
+    with patch.object(daily, "draft_brief", _fake_draft_partial_fail):
+        packet = await run_daily_briefing(parse_events(events))
+
+    checks.append(("total", packet.total == expected["total"], f"{packet.total} vs {expected['total']}"))
+    checks.append(("briefed", packet.briefed == expected["briefed"], f"{packet.briefed} vs {expected['briefed']}"))
+    checks.append(("stub", packet.stubs == expected["stub"], f"{packet.stubs} vs {expected['stub']}"))
+    checks.append(("failed", packet.failed == expected["failed"], f"{packet.failed} vs {expected['failed']}"))
+    checks.append(("skipped", len(packet.skipped) == expected["skipped"], f"{len(packet.skipped)} vs {expected['skipped']}"))
+    order = [i.event_id for i in packet.items]
+    checks.append(("start_time_order", order == expected["item_order"], f"{order}"))
+    failed_ids = [i.event_id for i in packet.items if i.status == "failed"]
+    checks.append(("failed_event_isolated", failed_ids == [expected["failed_event"]], f"{failed_ids}"))
+    checks.append(("no_writes", not packet.made_any_write, str(packet.write_tool_calls)))
+
+    passed = all(ok for _, ok, _ in checks)
+    return {"id": label, "type": "structural", "checks": checks, "overall_pass": passed}
+
+
 # --------------------------------------------------------------------------- #
 # Suite
 # --------------------------------------------------------------------------- #
@@ -217,6 +255,9 @@ async def run_suite(model: str, judge_model: str) -> dict:
     structural = [
         await run_structural_case("day_order_counts", DAY_EVENTS, DAY_EXPECTED),
         await run_structural_case("three_event_day", THREE_EVENT_DAY, THREE_EVENT_EXPECTED),
+        await run_partial_failure_case(
+            "partial_failure_isolation", PARTIAL_FAIL_DAY, PARTIAL_FAIL_EXPECTED
+        ),
     ]
 
     rows = list(quality) + structural

@@ -17,9 +17,9 @@ from datetime import datetime
 from pathlib import Path
 
 from .agent import DEFAULT_MODEL, draft_brief
-from .calendar import fetch_day_events, parse_events, resolve_date
+from .calendar import resolve_date
 from .config import MissingAPIKeyError, MissingNotionTokenError, ensure_credentials
-from .daily import render_packet, run_daily_briefing
+from .daily import build_day_packet, packet_provenance, render_packet
 from .web import format_web_context, gather_web_news
 
 
@@ -155,12 +155,7 @@ def _run_single(args) -> int:
 # Daily-packet mode (Phase 4)
 # --------------------------------------------------------------------------- #
 async def _build_packet(args, day):
-    raw, fetch_calls = await fetch_day_events(day, args.model)
-    events = parse_events(raw)
-    packet = await run_daily_briefing(
-        events, model=args.model, fetch_tool_calls=fetch_calls, enable_web=not args.no_web
-    )
-    return packet
+    return await build_day_packet(day, args.model, enable_web=not args.no_web)
 
 
 def _run_calendar(args) -> int:
@@ -186,20 +181,7 @@ def _run_calendar(args) -> int:
 
     # Combined provenance sidecar: per brief, the calendar event id + the Notion pages used.
     sidecar = _sidecar_path(out_path)
-    provenance = {
-        "date": day.isoformat(),
-        "model": args.model,
-        "counts": {
-            "total": packet.total,
-            "briefed": packet.briefed,
-            "unresolved": packet.stubs,
-            "skipped": len(packet.skipped),
-        },
-        "items": [i.sources for i in packet.items],
-        "skipped": [
-            {"event_id": s.event_id, "status": "skipped", "title": s.title} for s in packet.skipped
-        ],
-    }
+    provenance = packet_provenance(packet, day, args.model)
     sidecar.write_text(
         json.dumps(provenance, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )

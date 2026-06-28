@@ -14,6 +14,7 @@ guaranteed by construction.
 the package (and the pure `calendar.py` parser the evals use) stays importable without them.
 """
 
+import asyncio
 import os
 import re
 from datetime import date, datetime, timedelta
@@ -22,6 +23,10 @@ _SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 _SA_FILE_ENV = "GOOGLE_SERVICE_ACCOUNT_FILE"
 _CAL_ID_ENV = "GOOGLE_CALENDAR_ID"
 _TAG_RE = re.compile(r"<[^>]+>")
+# Whole-read timeout for the calendar. The google client is SYNCHRONOUS, so we run it in a thread
+# and bound it with asyncio.wait_for — a hung calendar then fails the run (→ failure email) rather
+# than blocking the event loop forever. Override with CAL_TIMEOUT (seconds).
+_CAL_TIMEOUT = int(os.environ.get("CAL_TIMEOUT", "60") or "60")
 
 
 class CalendarAuthError(RuntimeError):
@@ -83,14 +88,8 @@ def _clean_description(desc: str) -> str:
     return text[:300]
 
 
-async def fetch_day_events(day: date, model: str | None = None) -> tuple[list[dict], list[str]]:
-    """Read a day's events read-only via the service account.
-
-    Returns (raw_events, tool_calls). `model` is accepted for signature compatibility with the
-    former agentic fetch but is unused (no model is involved). `tool_calls` is always empty: the
-    read uses a read-only scope, so there is nothing to audit and zero writes is guaranteed.
-    The raw events use the standard Google Calendar shape that `calendar.parse_events` consumes.
-    """
+def _read_day_blocking(day: date) -> list[dict]:
+    """SYNCHRONOUS calendar read (creds build + day-bounds + events list). Runs in a worker thread."""
     cid = _calendar_id()
     svc = _service()
     time_min, time_max = _day_bounds(svc, cid, day)
@@ -120,4 +119,24 @@ async def fetch_day_events(day: date, model: str | None = None) -> tuple[list[di
                 "creator": e.get("creator", {}),
             }
         )
+    return raw
+
+
+async def fetch_day_events(day: date, model: str | None = None) -> tuple[list[dict], list[str]]:
+    """Read a day's events read-only via the service account, bounded by `_CAL_TIMEOUT`.
+
+    Returns (raw_events, tool_calls). `model` is accepted for signature compatibility with the
+    former agentic fetch but is unused (no model is involved). `tool_calls` is always empty: the
+    read uses a read-only scope, so there is nothing to audit and zero writes is guaranteed.
+    The raw events use the standard Google Calendar shape that `calendar.parse_events` consumes.
+
+    The google client is synchronous, so the read runs in a worker thread under `asyncio.wait_for`;
+    a hung calendar raises `CalendarAuthError` (→ whole-run failure email) instead of hanging.
+    """
+    try:
+        raw = await asyncio.wait_for(asyncio.to_thread(_read_day_blocking, day), _CAL_TIMEOUT)
+    except asyncio.TimeoutError as e:
+        raise CalendarAuthError(
+            f"Google Calendar read timed out after {_CAL_TIMEOUT}s."
+        ) from e
     return raw, []

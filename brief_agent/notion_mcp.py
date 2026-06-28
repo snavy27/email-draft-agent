@@ -36,6 +36,8 @@ _CRM_DS = {ACCOUNTS_DS, MEETINGS_DS, CONTACTS_DS}
 
 _API = "https://api.notion.com/v1"
 _VERSION = "2025-09-03"  # data-sources API: pages live under `data_source_id` parents
+# Per-request timeout so a hung Notion call can't stall a meeting indefinitely. Override NOTION_TIMEOUT.
+_TIMEOUT = int(os.environ.get("NOTION_TIMEOUT", "30") or "30")
 _UUID_RE = re.compile(r"[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}")
 
 # The MCP server name; full tool names become mcp__brief_notion__notion-search / …notion-fetch.
@@ -67,7 +69,7 @@ def _request(method: str, path: str, body: dict | None = None) -> dict:
         },
     )
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=_TIMEOUT) as resp:
             return json.load(resp)
     except urllib.error.HTTPError as e:
         detail = ""

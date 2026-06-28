@@ -11,6 +11,7 @@ the run so the caller can ASSERT zero writes to both Calendar and Notion.
 """
 
 import asyncio
+import os
 from dataclasses import dataclass, field
 from datetime import date
 
@@ -20,10 +21,15 @@ from .agent import (
     MeetingHint,
     draft_brief,
 )
-from .calendar import CalEvent
+from .calendar import CalEvent, fetch_day_events, parse_events
 from .web import format_web_context, gather_web_news
 
 _MAX_CONCURRENCY = 3  # cap concurrent per-meeting drafts (matches the eval suite)
+
+# Per-meeting wall-clock budget. One meeting's whole pipeline (its Notion gather, web research, and
+# Claude draft all run inside `_brief_one`) must finish within this, else that ONE meeting is failed
+# and the rest of the packet still ships. Override with BRIEF_MEETING_TIMEOUT (seconds).
+_PER_MEETING_TIMEOUT = int(os.environ.get("BRIEF_MEETING_TIMEOUT", "300") or "300")
 
 
 @dataclass
@@ -33,10 +39,11 @@ class PacketItem:
     event_id: str
     title: str
     when: str
-    status: str            # "briefed" | "stub" | "skipped"
+    status: str            # "briefed" | "stub" | "skipped" | "failed"
     sort_key: float
     person: str | None = None
-    text: str = ""         # rendered brief/stub markdown ("" for skipped)
+    text: str = ""         # rendered brief/stub markdown ("" for skipped/failed)
+    reason: str = ""       # why a "failed" item could not complete (empty otherwise)
     sources: dict = field(default_factory=dict)
     body_words: int = 0
     retried: bool = False
@@ -59,6 +66,11 @@ class DayPacket:
     @property
     def stubs(self) -> int:
         return sum(1 for i in self.items if i.status == "stub")
+
+    @property
+    def failed(self) -> int:
+        """External meetings whose brief could not be produced (error/timeout) — isolated."""
+        return sum(1 for i in self.items if i.status == "failed")
 
     @property
     def total(self) -> int:
@@ -143,31 +155,59 @@ def _hint(event: CalEvent) -> MeetingHint:
     )
 
 
-async def _brief_one(
+def _failed_item(event: CalEvent, reason: str) -> PacketItem:
+    """A per-meeting failure note: this ONE meeting could not be briefed; the packet still ships."""
+    a = event.attendee or {}
+    return PacketItem(
+        event_id=event.id, title=event.title, when=event.when_str(),
+        status="failed", sort_key=event.sort_key(), person=a.get("name"),
+        text="", reason=reason,
+        sources={"event_id": event.id, "status": "failed", "reason": reason},
+    )
+
+
+async def _brief_one_safe(
     event: CalEvent, model: str, sem: asyncio.Semaphore, enable_web: bool
 ) -> PacketItem:
+    """Isolate one meeting: hold the concurrency slot, bound it by a timeout, never propagate.
+
+    The semaphore is acquired here (NOT inside the timeout) so queue-wait doesn't count against the
+    per-meeting budget. Any error or timeout becomes a `failed` PacketItem so a single bad meeting
+    cannot sink the whole packet.
+    """
+    async with sem:
+        try:
+            return await asyncio.wait_for(
+                _brief_one(event, model, enable_web), _PER_MEETING_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            return _failed_item(event, f"timed out after {_PER_MEETING_TIMEOUT}s")
+        except Exception as exc:  # noqa: BLE001 - isolate; the rest of the day still ships
+            return _failed_item(event, f"{type(exc).__name__}: {exc}")
+
+
+async def _brief_one(event: CalEvent, model: str, enable_web: bool) -> PacketItem:
     """Draft one external event into a PacketItem (full brief, or stub on no CRM match).
 
     When `enable_web`, first gathers company-level web news (read-only) and injects it into the
     draft. Web tool calls are returned in the item's tool_calls so the packet's zero-writes
     assertion covers them. A no-CRM-match event becomes a stub and the web context is discarded
-    (no resolved account to attach company news to).
+    (no resolved account to attach company news to). Raises on error — `_brief_one_safe` isolates it.
     """
     a = event.attendee or {}
     web_calls: list[str] = []
     web_sources: list = []
     web_ctx = web_urls = None
-    async with sem:
-        if enable_web:
-            items, web_calls = await gather_web_news(event.company_token, model)
-            web_sources = [it.to_dict() for it in items]
-            if items:
-                web_ctx = format_web_context(items)
-                web_urls = [it.url for it in items]
-        result = await draft_brief(
-            event.company_token, model=model, meeting=_hint(event),
-            web_context=web_ctx, web_urls=web_urls,
-        )
+    if enable_web:
+        items, web_calls = await gather_web_news(event.company_token, model)
+        web_sources = [it.to_dict() for it in items]
+        if items:
+            web_ctx = format_web_context(items)
+            web_urls = [it.url for it in items]
+    result = await draft_brief(
+        event.company_token, model=model, meeting=_hint(event),
+        web_context=web_ctx, web_urls=web_urls,
+    )
 
     if result.unresolved:
         # Agent could not resolve the account/person → deterministic calendar-only stub.
@@ -201,15 +241,17 @@ async def run_daily_briefing(
     *,
     fetch_tool_calls: list[str] | None = None,
     enable_web: bool = False,
+    day: date | None = None,
 ) -> DayPacket:
     """Batch the per-meeting engine over a day's (already-parsed) events.
 
     `fetch_tool_calls` lets the caller fold the calendar-read agent's tool calls into the
     packet's zero-writes accounting. `enable_web` turns on Phase 5 company-news enrichment
-    (default OFF so the deterministic eval path never hits the network). `events` must be the
-    output of `calendar.parse_events` (sorted by start time).
+    (default OFF so the deterministic eval path never hits the network). `day` labels the packet
+    explicitly so an EMPTY day is still dated correctly (else it's inferred from the first event).
+    `events` must be the output of `calendar.parse_events` (sorted by start time).
     """
-    day = events[0].start.date() if events else date.today()
+    day = day or (events[0].start.date() if events else date.today())
 
     skipped: list[PacketItem] = [
         PacketItem(
@@ -225,7 +267,9 @@ async def run_daily_briefing(
 
     external = [e for e in events if not e.is_internal]
     sem = asyncio.Semaphore(_MAX_CONCURRENCY)
-    items = await asyncio.gather(*(_brief_one(e, model, sem, enable_web) for e in external))
+    # Each meeting is isolated + timeout-bounded; a failure becomes a "failed" item, never an
+    # exception, so one bad meeting cannot sink the packet.
+    items = await asyncio.gather(*(_brief_one_safe(e, model, sem, enable_web) for e in external))
     items = sorted(items, key=lambda i: i.sort_key)
 
     tool_calls = list(fetch_tool_calls or [])
@@ -236,16 +280,54 @@ async def run_daily_briefing(
 
 
 # --------------------------------------------------------------------------- #
+# Shared orchestration helpers (used by BOTH the CLI and the scheduled run, so the two
+# paths cannot drift — they fetch, brief, and build provenance identically).
+# --------------------------------------------------------------------------- #
+async def build_day_packet(
+    day: date, model: str = DEFAULT_MODEL, *, enable_web: bool = True
+) -> DayPacket:
+    """Read a day's calendar (read-only) and brief every external meeting into one DayPacket."""
+    raw, fetch_calls = await fetch_day_events(day, model)
+    events = parse_events(raw)
+    return await run_daily_briefing(
+        events, model=model, fetch_tool_calls=fetch_calls, enable_web=enable_web, day=day
+    )
+
+
+def packet_provenance(packet: DayPacket, day: date, model: str) -> dict:
+    """The combined `.sources.json` sidecar: per-brief event id + Notion pages used + web sources."""
+    return {
+        "date": day.isoformat(),
+        "model": model,
+        "counts": {
+            "total": packet.total,
+            "briefed": packet.briefed,
+            "unresolved": packet.stubs,
+            "failed": packet.failed,
+            "skipped": len(packet.skipped),
+        },
+        "items": [i.sources for i in packet.items],
+        "skipped": [
+            {"event_id": s.event_id, "status": "skipped", "title": s.title}
+            for s in packet.skipped
+        ],
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Rendering
 # --------------------------------------------------------------------------- #
 def render_packet(packet: DayPacket) -> str:
-    """Render the combined daily packet: header + counts + skipped summary + briefs in order."""
+    """Render the combined daily packet: header + counts + skipped + could-not-complete + briefs."""
     day_str = packet.day.strftime("%A %d %B %Y")
+    counts = [f"{packet.briefed} briefed", f"{packet.stubs} unresolved"]
+    if packet.failed:
+        counts.append(f"{packet.failed} could not complete")
+    counts.append(f"{len(packet.skipped)} skipped (internal)")
     out: list[str] = [
         f"# Daily briefing — {day_str}",
         "",
-        f"{packet.total} meetings · {packet.briefed} briefed / {packet.stubs} unresolved / "
-        f"{len(packet.skipped)} skipped (internal)",
+        f"{packet.total} meetings · " + " / ".join(counts),
         "",
         "## Skipped (internal)",
     ]
@@ -254,7 +336,16 @@ def render_packet(packet: DayPacket) -> str:
     else:
         out.append("_None._")
 
+    # Per-meeting failures: a compact section (in start order) so the rest of the day still ships.
+    failures = [i for i in packet.items if i.status == "failed"]
+    if failures:
+        out += ["", "## Could not complete"]
+        out += [f"- {i.when} — {i.title} — {i.reason}" for i in failures]
+
+    # Full briefs / stubs, in start order (failures already summarised above).
     for item in packet.items:
+        if item.status == "failed":
+            continue
         out += ["", "---", "", item.text]
 
     return "\n".join(out) + "\n"

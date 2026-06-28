@@ -13,6 +13,7 @@ Gmail: set `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER=<you>@gmail.c
 
 import os
 import smtplib
+import ssl
 from dataclasses import dataclass
 from email.message import EmailMessage
 
@@ -52,13 +53,16 @@ def load_email_config(to_override: str | None = None) -> EmailConfig:
     host=smtp.gmail.com, port=587, sender=SMTP_USER, recipient=BRIEF_RECIPIENT or a fixed address.
     """
     user = os.environ.get("SMTP_USER", "").strip()
-    # Gmail App Passwords are shown as 4 space-separated groups ("abcd efgh ijkl mnop"); the actual
-    # secret is the 16 chars with no spaces. Drop ALL whitespace so a pasted-with-spaces value works.
-    password = "".join(os.environ.get("SMTP_PASS", "").split())
+    host = os.environ.get("SMTP_HOST", "smtp.gmail.com").strip() or "smtp.gmail.com"
+
+    # Gmail App Passwords are displayed as 4 space-separated groups ("abcd efgh ijkl mnop") but the
+    # real secret is the 16 chars with no spaces. Strip internal spaces ONLY for Gmail; for any other
+    # provider just trim the ends, so a legitimate password containing spaces is never mangled.
+    raw_pass = os.environ.get("SMTP_PASS", "")
+    password = "".join(raw_pass.split()) if host.lower() == "smtp.gmail.com" else raw_pass.strip()
     if not user or not password:
         raise MissingSMTPConfigError(_MISSING_SMTP_MESSAGE)
 
-    host = os.environ.get("SMTP_HOST", "smtp.gmail.com").strip() or "smtp.gmail.com"
     try:
         port = int(os.environ.get("SMTP_PORT", "587").strip() or "587")
     except ValueError as exc:
@@ -66,7 +70,14 @@ def load_email_config(to_override: str | None = None) -> EmailConfig:
 
     sender = os.environ.get("BRIEF_FROM", "").strip() or user
     recipient = (to_override or os.environ.get("BRIEF_RECIPIENT", "").strip()
-                 or _DEFAULT_RECIPIENT)
+                 or _DEFAULT_RECIPIENT).strip()
+    # Enforce the single-recipient invariant: a comma/whitespace-separated list would silently
+    # fan the confidential brief out to every address via the To header. Reject it.
+    if not recipient or any(c in recipient for c in ", \t") or recipient.count("@") != 1:
+        raise MissingSMTPConfigError(
+            "BRIEF_RECIPIENT / --to must be exactly ONE email address (no lists). "
+            f"Got: {recipient!r}"
+        )
     return EmailConfig(host, port, user, password, sender, recipient)
 
 
@@ -94,18 +105,27 @@ def send_email(
     body_text: str,
     attachments: list[tuple[str, bytes]] | None = None,
 ) -> None:
-    """Send one message to the single configured recipient over STARTTLS. Raises on failure.
+    """Send one message to the single configured recipient over verified TLS. Raises on failure.
 
     Send-only: opens an SMTP submission connection, authenticates, sends, quits. No mailbox is ever
-    read. The password lives only in `cfg` and is never logged.
+    read. TLS uses a `create_default_context()` (certificate + hostname verification ON, unlike
+    smtplib's default for a context-less `starttls()`), so the credentials and the brief can't be
+    captured by a network MITM. Port 465 uses implicit TLS (SMTP_SSL); anything else uses STARTTLS.
+    The password lives only in `cfg` and is never logged.
     """
     msg = _build_message(cfg, subject, body_text, attachments)
-    with smtplib.SMTP(cfg.host, cfg.port, timeout=60) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(cfg.user, cfg.password)
-        smtp.send_message(msg)
+    context = ssl.create_default_context()
+    if cfg.port == 465:
+        with smtplib.SMTP_SSL(cfg.host, cfg.port, timeout=60, context=context) as smtp:
+            smtp.login(cfg.user, cfg.password)
+            smtp.send_message(msg)
+    else:
+        with smtplib.SMTP(cfg.host, cfg.port, timeout=60) as smtp:
+            smtp.ehlo()
+            smtp.starttls(context=context)
+            smtp.ehlo()
+            smtp.login(cfg.user, cfg.password)
+            smtp.send_message(msg)
 
 
 def send_failure_notice(

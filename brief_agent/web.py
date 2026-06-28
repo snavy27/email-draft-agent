@@ -16,7 +16,9 @@ the CRM is the sole source of truth for who you're meeting.
 """
 
 import json
+import os
 from dataclasses import dataclass, field
+from datetime import date
 from urllib.parse import urlparse
 
 from claude_agent_sdk import (
@@ -34,6 +36,12 @@ from .agent import CALENDAR_WRITE_TOOLS, NOTION_WRITE_TOOLS, WEB_READ_TOOLS, _re
 WEB_CATEGORIES = ["funding", "launch", "earnings", "M&A", "leadership", "incident"]
 
 _MAX_ITEMS = 6  # keep the injected context tight
+
+# Recency window for "What's changed" web news. Items older than this (or with no parseable
+# date) are dropped IN PYTHON before the draft ever sees them — so "every web claim is recent
+# and sourced" is a code invariant, not a prompt hope. Override with WEB_RECENCY_DAYS.
+_RECENCY_DAYS = int(os.environ.get("WEB_RECENCY_DAYS", "183") or "183")
+_FUTURE_SKEW_DAYS = 2  # tolerate small clock/timezone skew on a "published today" item
 
 
 @dataclass
@@ -90,26 +98,75 @@ def _extract_json_array(text: str) -> list:
         return []
 
 
+def _build_item(r: dict) -> WebItem | None:
+    """Build one WebItem from a raw dict, or None if it lacks a valid http(s) URL / headline."""
+    if not isinstance(r, dict):
+        return None
+    url = (r.get("url") or "").strip()
+    headline = (r.get("headline") or r.get("title") or "").strip()
+    if not _valid_url(url) or not headline:
+        return None  # enforcement: no source URL (or no headline) -> not a usable item
+    return WebItem(
+        headline=headline,
+        url=url,
+        date=str(r.get("date", "")).strip(),
+        category=str(r.get("category", "")).strip(),
+        summary=str(r.get("summary", "")).strip(),
+        source=_domain(url),
+    )
+
+
 def _to_items(raw: list) -> list[WebItem]:
-    """Build WebItems from raw dicts, DROPPING any without a valid http(s) URL."""
+    """Build WebItems from raw dicts, DROPPING any without a valid http(s) URL. (URL check only.)"""
     items: list[WebItem] = []
     for r in raw:
-        if not isinstance(r, dict):
+        it = _build_item(r)
+        if it is not None:
+            items.append(it)
+        if len(items) >= _MAX_ITEMS:
+            break
+    return items
+
+
+def _parse_date(s: str) -> date | None:
+    """Parse a news item's date. Accepts ISO `YYYY-MM-DD` and `YYYY-MM`; None on anything else."""
+    s = (s or "").strip()
+    if not s:
+        return None
+    try:
+        return date.fromisoformat(s)
+    except ValueError:
+        pass
+    parts = s.split("-")
+    if len(parts) == 2:
+        try:
+            return date(int(parts[0]), int(parts[1]), 1)
+        except (ValueError, TypeError):
+            return None
+    return None
+
+
+def validate_web_items(
+    raw: list, *, now: date, max_age_days: int = _RECENCY_DAYS
+) -> list[WebItem]:
+    """The grounding gate: keep only items with a real URL AND a parseable, in-window date.
+
+    Runs in Python BEFORE drafting, so the model is only ever offered validated items. Drops any
+    item without a resolvable source URL (via `_build_item`) and any whose date is missing,
+    unparseable, in the future beyond a small skew, or older than `max_age_days`. Caps at _MAX_ITEMS.
+    """
+    items: list[WebItem] = []
+    for r in raw:
+        it = _build_item(r)
+        if it is None:
             continue
-        url = (r.get("url") or "").strip()
-        headline = (r.get("headline") or r.get("title") or "").strip()
-        if not _valid_url(url) or not headline:
-            continue  # enforcement: no source URL (or no headline) -> not a usable item
-        items.append(
-            WebItem(
-                headline=headline,
-                url=url,
-                date=str(r.get("date", "")).strip(),
-                category=str(r.get("category", "")).strip(),
-                summary=str(r.get("summary", "")).strip(),
-                source=_domain(url),
-            )
-        )
+        d = _parse_date(it.date)
+        if d is None:
+            continue  # strict: no verifiable date -> cannot confirm recency -> drop
+        age = (now - d).days
+        if age < -_FUTURE_SKEW_DAYS or age > max_age_days:
+            continue  # future-dated (beyond skew) or older than the window -> drop
+        items.append(it)
         if len(items) >= _MAX_ITEMS:
             break
     return items
@@ -165,7 +222,9 @@ async def gather_web_news(company: str, model: str = "opus") -> tuple[list[WebIt
                 return [], tool_calls
     except Exception:  # noqa: BLE001 - web is best-effort; never let it break the brief
         return [], tool_calls
-    return _to_items(_extract_json_array("".join(texts))), tool_calls
+    # Grounding gate: only URL-bearing, in-recency-window items reach the draft.
+    items = validate_web_items(_extract_json_array("".join(texts)), now=date.today())
+    return items, tool_calls
 
 
 def format_web_context(items: list[WebItem]) -> str:

@@ -1,0 +1,482 @@
+{
+  "model": "opus",
+  "judge_model": "opus",
+  "timestamp": "2026-06-28T12:15:03Z",
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  },
+  "zero_writes": true,
+  "cases": [
+    {
+      "id": "web_relevant",
+      "expect": "appears",
+      "brief": "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)\n\n**When:** Wed 1 Jul 2026 · **Who:** Greg Sullivan, VP Operations (economic buyer) — Dana Cole, CTO (decision-maker), may be involved · **Purpose:** Reliability plan / renewal-risk check-in ahead of 31 Aug renewal · **Sources:** Verizon (account); QBR + Outage post-mortem + Reliability plan review (meetings); Greg Sullivan + Dana Cole (contacts) · Web: https://news.example.com/verizon-frontier-acquisition\n\n---\n\n## Bottom line\nVerizon ($980K ARR) is **At Risk** and renews 31 Aug. Two Q2 outages have badly damaged trust, and Greg is openly evaluating alternatives with competitor threat High. This meeting is about one thing: showing measurable uptime improvement with hard data and a credible reliability plan — no excuses.\n\n## Who you're meeting\n- **Greg Sullivan, VP Operations (economic buyer):** Blunt, ops-focused, impatient with delays. Measures everything in uptime and tickets; low tolerance for excuses.\n- **Dana Cole, CTO (decision-maker):** Greg's boss, will make the stay-or-switch call. Less emotional than Greg, but wants the reliability data.\n\n## What's changed since you last spoke\n- Two outages in Q2 severely damaged trust; sentiment has been negative since May.\n- On 8 Jun, Greg confirmed he is evaluating alternatives and wants measurable uptime gains.\n- Greg has formally requested a reliability improvement plan.\n- Company-level: Verizon agreed to acquire Frontier's fiber business for $9.6B — broadband expansion may raise their reliability/scale expectations.\n\n## Likely to come up\n- Proof that the Q2 outages are resolved and won't recur.\n- Specific uptime metrics and ticket trends since May.\n- The formal reliability plan: scope, owners, timeline.\n- Renewal terms, given the 31 Aug deadline.\n\n## Your goals & talking points\n- **Lead with data:** present concrete uptime improvement and ticket reduction — numbers first, narrative second.\n- **Deliver the plan:** walk through the reliability improvement plan with clear milestones and accountability.\n- **Engage Dana:** frame the plan for the decision-maker who wants evidence, not reassurance.\n\n## Watch-outs\n- No excuses — own the outages briefly and move to the fix.\n- Don't over-promise on commitments you can't measure; Greg will hold you to every number.\n\n## Desired outcome\nGreg and Dana accept the reliability plan and agree to proceed toward renewal.",
+      "body_words": 300,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [
+        "https://news.example.com/verizon-frontier-acquisition"
+      ],
+      "web_cited": [
+        "https://news.example.com/verizon-frontier-acquisition"
+      ],
+      "sources": {
+        "account": {
+          "title": "Verizon",
+          "url": "https://app.notion.com/p/Verizon-38cbf93e8ed8813ab2b9ec8ba5788e7e"
+        },
+        "meetings": [
+          {
+            "title": "Verizon — QBR",
+            "url": "https://app.notion.com/p/Verizon-QBR-38cbf93e8ed8812487c0d77b697c74d8"
+          },
+          {
+            "title": "Verizon — Outage post-mortem",
+            "url": "https://app.notion.com/p/Verizon-Outage-post-mortem-38cbf93e8ed881bfa8e0f1e06a9ef93d"
+          },
+          {
+            "title": "Verizon — Reliability plan review",
+            "url": "https://app.notion.com/p/Verizon-Reliability-plan-review-38cbf93e8ed8817c9dc6cead484d1ead"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Greg Sullivan",
+            "url": "https://app.notion.com/p/Greg-Sullivan-38cbf93e8ed8819b8f80de38150e398f"
+          },
+          {
+            "title": "Dana Cole",
+            "url": "https://app.notion.com/p/Dana-Cole-38cbf93e8ed88158bd60e4dcf814e809"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "300 words"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "web_fact_in_whats_changed",
+            true,
+            "'Frontier' in What's changed=True"
+          ],
+          [
+            "web_url_cited",
+            true,
+            "https://news.example.com/verizon-frontier-acquisition cited=True"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim traces to the fetched context: ARR $980K, At Risk, 31 Aug renewal, 1 Jul meeting, Greg Sullivan VP Ops/economic buyer, Dana Cole CTO/decision-maker, two Q2 outages, negative sentiment since May, 8 Jun reliability review, contact styles, and the $9.6B Frontier acquisition all match. Sources line cites real pages. No invented specifics.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the at-risk reliability situation, the renewal stakes, the two-buyer dynamic (Greg + Dana), and the data-first/no-excuses imperative drawn straight from the watch-outs. Web acquisition note is correctly framed as company-level context.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; numbers-first framing, no filler or flattery, matches Greg's blunt ops style.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "web_empty",
+      "expect": "empty",
+      "brief": "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)\n\n**When:** Wed 1 Jul 2026 · **Who:** Greg Sullivan, VP Operations (economic buyer); CTO Dana Cole makes the final call · **Purpose:** Rebuild trust after Q2 outages ahead of the 31 Aug renewal · **Sources:** Verizon (account), QBR + Outage post-mortem + Reliability plan review (meetings), Greg Sullivan + Dana Cole (contacts)\n\n---\n\n## Bottom line\nVerizon is a $980K account, At Risk, with renewal on 31 August and competitor threat High. Two Q2 outages badly damaged trust and Greg is openly evaluating alternatives. This meeting is about showing measurable uptime improvement with hard data and a credible reliability plan — not excuses. Get this right or the renewal is in real jeopardy.\n\n## Who you're meeting\n- **Greg Sullivan** — VP Operations, economic buyer. Blunt, ops-focused, impatient with delays; measures everything in uptime and tickets, low tolerance for excuses.\n- **Dana Cole** — CTO, Greg's boss and the decision-maker on stay-or-switch. Less emotional than Greg but wants the reliability data.\n\n## What's changed since you last spoke\n- Two outages in Q2 hurt trust badly; sentiment has been negative since May.\n- Greg requested a formal reliability improvement plan (post-mortem, 8 May).\n- At the 8 Jun review he was openly evaluating alternatives and asked for measurable uptime gains.\n\n## Likely to come up\n- Proof that uptime has actually improved — with numbers, not assurances.\n- The status and specifics of the reliability improvement plan.\n- Renewal terms and whether reliability justifies staying.\n\n## Your goals & talking points\n- **Lead with data:** present concrete uptime and ticket metrics showing the trend is reversing.\n- **Own the outages:** acknowledge the Q2 failures briefly, then pivot to the plan and what's changed.\n- **Engage Dana directly:** give the CTO the reliability evidence she needs to back staying.\n\n## Watch-outs\n- No excuses — Greg has zero tolerance for them; bring data and a plan.\n- Don't over-explain the outages or make promises you can't measure.\n\n## Desired outcome\nGreg and Dana accept the reliability plan as credible and agree to move toward renewal.",
+      "body_words": 291,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [],
+      "web_cited": [],
+      "sources": {
+        "account": {
+          "title": "Verizon",
+          "url": "https://app.notion.com/p/Verizon-38cbf93e8ed8813ab2b9ec8ba5788e7e"
+        },
+        "meetings": [
+          {
+            "title": "Verizon — QBR",
+            "url": "https://app.notion.com/p/Verizon-QBR-38cbf93e8ed8812487c0d77b697c74d8"
+          },
+          {
+            "title": "Verizon — Outage post-mortem",
+            "url": "https://app.notion.com/p/Verizon-Outage-post-mortem-38cbf93e8ed881bfa8e0f1e06a9ef93d"
+          },
+          {
+            "title": "Verizon — Reliability plan review",
+            "url": "https://app.notion.com/p/Verizon-Reliability-plan-review-38cbf93e8ed8817c9dc6cead484d1ead"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Greg Sullivan",
+            "url": "https://app.notion.com/p/Greg-Sullivan-38cbf93e8ed8819b8f80de38150e398f"
+          },
+          {
+            "title": "Dana Cole",
+            "url": "https://app.notion.com/p/Dana-Cole-38cbf93e8ed88158bd60e4dcf814e809"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "291 words"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "no_web_when_empty",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim traces to the fetched context: $980K ARR, At Risk, renewal 31 Aug, competitor threat High, two Q2 outages, Greg as VP Ops/economic buyer, Dana Cole as CTO/decision-maker, meeting date 2026-07-01, negative sentiment from May post-mortem onward, and the reliability-plan request all match source pages. Sources line cites real pages that appear in context. No invented specifics despite being labeled web-enriched.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the account's real situation — churn/competitor risk ahead of renewal, the need for data-driven uptime proof, the Greg/Dana dynamic, and the no-excuses posture. Talking points and watch-outs align with the source watch-outs and next steps.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; no filler or flattery. Matches the blunt, ops-focused style the context calls for.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "web_wrong_entity",
+      "expect": "excluded",
+      "brief": "# Meeting Brief — Greg Sullivan (VP Operations, Verizon)\n\n**When:** Wed 1 Jul 2026 · **Who:** Greg Sullivan, VP Operations (economic buyer); his boss Dana Cole, CTO, makes the final call · **Purpose:** Recover an at-risk account ahead of the 31 Aug renewal · **Sources:** Verizon (account), QBR + Outage post-mortem + Reliability plan review (meetings), Greg Sullivan + Dana Cole (contacts)\n\n---\n\n## Bottom line\nVerizon ($980K ARR) is at risk and renews 31 August. Two Q2 outages badly damaged trust, and Greg is openly evaluating alternatives with competitor pressure high. This meeting is about proving reliability has measurably improved — show uptime data and a credible plan, not apologies. Win Greg, but remember Dana Cole (CTO) makes the stay-or-switch decision.\n\n## Who you're meeting\n- **Greg Sullivan** — VP Operations and economic buyer. Blunt, ops-focused, impatient with delays; measures everything in uptime and tickets, low tolerance for excuses.\n- **Dana Cole** — CTO, Greg's boss and the decision-maker. Less emotional than Greg, but wants the reliability data before deciding.\n\n## What's changed since you last spoke\n- Two outages in Q2 hurt trust badly; the second triggered a support escalation in May.\n- Greg requested a formal reliability improvement plan and is openly evaluating alternatives.\n- At the 8 Jun review he asked for measurable uptime gains — data, no excuses.\n\n## Likely to come up\n- Hard proof that reliability has improved since the Q2 outages.\n- The status and substance of the formal reliability improvement plan.\n- Renewal terms and whether to stay or switch, given competitor interest.\n\n## Your goals & talking points\n- **Lead with data:** open with concrete uptime numbers and ticket trends since May — no preamble.\n- **Present the plan:** walk through the reliability improvement plan with owners and dates.\n- **Reach Dana:** frame the data for the decision-maker; offer a session with her directly.\n\n## Watch-outs\n- No excuses or over-explaining the outages — Greg has zero tolerance for it.\n- Don't over-promise on uptime you can't evidence; competitor threat is high.\n\n## Desired outcome\nGreg accepts the reliability plan as credible and agrees to a renewal conversation involving Dana.",
+      "body_words": 297,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [
+        "https://news.example.com/verizon-cafe-50th"
+      ],
+      "web_cited": [],
+      "sources": {
+        "account": {
+          "title": "Verizon",
+          "url": "https://app.notion.com/p/Verizon-38cbf93e8ed8813ab2b9ec8ba5788e7e"
+        },
+        "meetings": [
+          {
+            "title": "Verizon — QBR",
+            "url": "https://app.notion.com/p/Verizon-QBR-38cbf93e8ed8812487c0d77b697c74d8"
+          },
+          {
+            "title": "Verizon — Outage post-mortem",
+            "url": "https://app.notion.com/p/Verizon-Outage-post-mortem-38cbf93e8ed881bfa8e0f1e06a9ef93d"
+          },
+          {
+            "title": "Verizon — Reliability plan review",
+            "url": "https://app.notion.com/p/Verizon-Reliability-plan-review-38cbf93e8ed8817c9dc6cead484d1ead"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Greg Sullivan",
+            "url": "https://app.notion.com/p/Greg-Sullivan-38cbf93e8ed8819b8f80de38150e398f"
+          },
+          {
+            "title": "Dana Cole",
+            "url": "https://app.notion.com/p/Dana-Cole-38cbf93e8ed88158bd60e4dcf814e809"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Greg Sullivan (VP Operations, Verizon)"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "297 words"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "wrong_entity_excluded",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every factual claim traces to the fetched context: $980K ARR, At Risk status, 31 Aug renewal, two Q2 outages, May support escalation (Outage post-mortem 2026-05-08), 8 Jun reliability plan review, Greg Sullivan VP Ops/economic buyer, Dana Cole CTO/decision-maker, high competitor threat, 'data not excuses' watch-out. Sources line cites real pages present in context. The unrelated Verizon Cafe web item was correctly ignored. Nothing invented.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the account's real situation — at-risk renewal driven by outage-damaged trust, the demand for measurable uptime data over apologies, and the Greg-vs-Dana buying dynamic. Talking points and desired outcome align precisely with the notes' guidance.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident; no filler or flattery. Imperative talking points and crisp bottom line match the blunt, ops-focused contact style.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "web_contradicts_contact",
+      "expect": "contact_protected",
+      "brief": "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)\n\n**When:** Wed 1 Jul 2026 · **Who:** Greg Sullivan, VP Operations (economic buyer); Dana Cole, CTO, may be involved · **Purpose:** Reliability recovery ahead of 31 Aug renewal · **Sources:** Verizon (account), QBR + Outage post-mortem + Reliability plan review (meetings), Greg Sullivan + Dana Cole (contacts)\n\n---\n\n## Bottom line\nVerizon ($980K ARR) is At Risk and openly evaluating alternatives after two Q2 outages destroyed trust. Renewal is 31 Aug; competitor threat is High. This meeting is about one thing: showing measurable uptime improvement with hard data and a credible reliability plan — no excuses. Save the account by proving the problem is fixed, not by talking around it.\n\n## Who you're meeting\n- **Greg Sullivan** — VP Operations, economic buyer. Blunt, ops-focused, impatient with delays; measures everything in uptime and tickets, low tolerance for excuses. Currently evaluating alternatives.\n- **Dana Cole** — CTO, Greg's boss and the decision-maker on stay-or-switch. Less emotional than Greg, but wants the reliability data.\n\n## What's changed since you last spoke\n- Two Q2 outages badly damaged trust (post-mortem on 8 May).\n- Greg formally requested a reliability improvement plan and, at the 8 Jun review, said he is openly evaluating alternatives.\n- Trajectory has slid from Neutral (Mar QBR) to Negative across the last two meetings.\n\n## Likely to come up\n- Proof the outages are resolved and won't recur.\n- The reliability improvement plan — specifics, owners, timelines.\n- Renewal terms given the damaged relationship.\n\n## Your goals & talking points\n- **Lead with data:** present concrete uptime gains and ticket trends since May — numbers first, narrative second.\n- **Land the plan:** walk through the formal reliability plan with clear milestones and accountability.\n- **Engage Dana directly:** frame the data for the decision-maker, not just Greg.\n\n## Watch-outs\n- No excuses or over-explaining the outages — own it briefly, then show the fix.\n- Don't commit to renewal pricing on the spot; the conversation is reliability first.\n\n## Desired outcome\nGreg and Dana accept the reliability plan and agree to keep the renewal on track.",
+      "body_words": 297,
+      "retried": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "web_offered": [
+        "https://news.example.com/verizon-vp-operations-change"
+      ],
+      "web_cited": [],
+      "sources": {
+        "account": {
+          "title": "Verizon",
+          "url": "https://app.notion.com/p/Verizon-38cbf93e8ed8813ab2b9ec8ba5788e7e"
+        },
+        "meetings": [
+          {
+            "title": "Verizon — QBR",
+            "url": "https://app.notion.com/p/Verizon-QBR-38cbf93e8ed8812487c0d77b697c74d8"
+          },
+          {
+            "title": "Verizon — Outage post-mortem",
+            "url": "https://app.notion.com/p/Verizon-Outage-post-mortem-38cbf93e8ed881bfa8e0f1e06a9ef93d"
+          },
+          {
+            "title": "Verizon — Reliability plan review",
+            "url": "https://app.notion.com/p/Verizon-Reliability-plan-review-38cbf93e8ed8817c9dc6cead484d1ead"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Greg Sullivan",
+            "url": "https://app.notion.com/p/Greg-Sullivan-38cbf93e8ed8819b8f80de38150e398f"
+          },
+          {
+            "title": "Dana Cole",
+            "url": "https://app.notion.com/p/Dana-Cole-38cbf93e8ed88158bd60e4dcf814e809"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "297 words"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "no_invented_urls",
+            true,
+            "ok"
+          ],
+          [
+            "contradicting_person_ignored",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every factual claim traces to the CRM context: $980K ARR, At Risk, two Q2 outages, 31 Aug renewal, High competitor threat, 8 May post-mortem, 8 Jun review, Neutral→Negative sentiment trajectory, Greg (VP Ops, economic buyer, blunt/ops-focused) and Dana (CTO, decision-maker, Greg's boss). Wed 1 Jul matches Next Meeting 2026-07-01. Sources line cites real pages. Correctly ignored the person-level web claim about Greg's replacement, as required.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the at-risk reliability-recovery situation: outages destroyed trust, Greg evaluating alternatives, need to lead with uptime/ticket data and a credible plan, engage Dana as decision-maker, avoid pricing commitments. Useful and on-target.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; no filler or flattery. Matches Greg's blunt, data-first style.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    }
+  ]
+}

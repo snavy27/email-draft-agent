@@ -30,11 +30,17 @@ _SUBST = {
 }
 
 
+# Precomputed translation table (ordinal -> replacement) so substitution is one pass, not N scans.
+_TRANSLATE = {ord(src): dst for src, dst in _SUBST.items()}
+
+
 def _to_latin1(s: str) -> str:
-    """Map smart punctuation to ASCII, then drop anything still outside latin-1 (no exceptions)."""
-    for src, dst in _SUBST.items():
-        s = s.replace(src, dst)
-    return s.encode("latin-1", "replace").decode("latin-1")
+    """Map smart punctuation to ASCII, then drop anything still outside latin-1 (no exceptions).
+
+    NOTE: fpdf2 core fonts are latin-1 only, so a non-latin-1 codepoint (e.g. a CJK/Cyrillic name)
+    is replaced with '?'. A deeper fix (embed a Unicode TTF via fpdf2 add_font) is a known follow-up.
+    """
+    return s.translate(_TRANSLATE).encode("latin-1", "replace").decode("latin-1")
 
 
 class _Packet(FPDF):

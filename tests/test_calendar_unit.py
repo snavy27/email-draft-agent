@@ -19,7 +19,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import brief_agent.daily as daily
 from brief_agent.agent import BriefResult
 from brief_agent.calendar import parse_events, resolve_date
-from brief_agent.daily import _prepend_meeting_time, _stub_brief, run_daily_briefing
+from brief_agent.daily import (
+    _prepend_meeting_time,
+    _stub_brief,
+    render_packet,
+    run_daily_briefing,
+)
 
 SELF = {"email": "shardanavalika@gmail.com", "self": True, "organizer": True}
 
@@ -146,6 +151,75 @@ def test_run_daily_briefing_counts_and_order():
     assert packet.stubs == 1            # quantum
     assert len(packet.skipped) == 1     # standup
     assert [i.event_id for i in packet.items] == ["orbit", "quantum", "brightline"]
+    assert packet.made_any_write is False
+
+
+# --- Phase 8: partial-failure isolation + timeouts ------------------------- #
+def _mixed_day():
+    raw = [
+        _ev("orbit", "Reliability — Orbit Telecom", "10",
+            [SELF, _ext("Greg Sullivan", "greg.sullivan@orbittelecom.example.com")]),
+        _ev("quantum", "Intro — Quantum Robotics", "13",
+            [SELF, _ext("Jane Doe", "jane.doe@quantumrobotics.example.com")]),
+        _ev("brightline", "Compliance — Brightline Health", "15",
+            [SELF, _ext("Marcus Reed", "marcus.reed@brightlinehealth.example.com")]),
+        _ev("standup", "Internal standup", "11", [SELF]),
+    ]
+    return parse_events(raw)
+
+
+async def _fake_draft_raises_for_orbit(target, model="opus", *, meeting=None, web_context=None, web_urls=None):
+    company = (meeting.company if meeting else target).lower()
+    if "orbit" in company:
+        raise RuntimeError("boom resolve")
+    return BriefResult(
+        text="# Meeting Brief — fake\n\n**When:** x\n\n---\n\n## Bottom line\nb",
+        unresolved=("quantum" in company),
+        event_id=meeting.event_id if meeting else None,
+    )
+
+
+async def _fake_draft_hangs(target, model="opus", *, meeting=None, web_context=None, web_urls=None):
+    await asyncio.sleep(5)  # never completes within the test's tiny timeout
+    return BriefResult(text="# Meeting Brief — fake\n\n---\n\n## Bottom line\nb",
+                       event_id=meeting.event_id if meeting else None)
+
+
+def test_one_meeting_failure_does_not_sink_packet():
+    events = _mixed_day()
+    with patch.object(daily, "draft_brief", _fake_draft_raises_for_orbit):
+        packet = asyncio.run(run_daily_briefing(events))
+    assert packet.total == 4
+    assert packet.briefed == 1          # brightline
+    assert packet.stubs == 1            # quantum
+    assert packet.failed == 1           # orbit errored — isolated, not propagated
+    assert len(packet.skipped) == 1     # standup
+    failed = [i for i in packet.items if i.status == "failed"]
+    assert failed[0].event_id == "orbit"
+    assert "RuntimeError" in failed[0].reason
+    assert [i.event_id for i in packet.items] == ["orbit", "quantum", "brightline"]  # start order
+    assert packet.made_any_write is False
+    rendered = render_packet(packet)
+    assert "Could not complete" in rendered
+    assert "Orbit Telecom" in rendered          # failure summarised
+    assert "## Bottom line" in rendered          # the surviving brief still ships
+
+
+def test_hung_meeting_times_out_and_is_isolated():
+    orig = daily._PER_MEETING_TIMEOUT
+    daily._PER_MEETING_TIMEOUT = 0.2  # force a fast timeout for the test
+    try:
+        events = parse_events([
+            _ev("orbit", "Reliability — Orbit Telecom", "10",
+                [SELF, _ext("Greg Sullivan", "greg.sullivan@orbittelecom.example.com")]),
+        ])
+        with patch.object(daily, "draft_brief", _fake_draft_hangs):
+            packet = asyncio.run(run_daily_briefing(events))
+    finally:
+        daily._PER_MEETING_TIMEOUT = orig
+    assert packet.failed == 1
+    failed = [i for i in packet.items if i.status == "failed"]
+    assert "timed out" in failed[0].reason
     assert packet.made_any_write is False
 
 

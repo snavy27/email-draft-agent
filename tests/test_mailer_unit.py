@@ -6,6 +6,7 @@ serialized message or the config's log-safe summary.
 """
 
 import smtplib
+import ssl
 import sys
 from pathlib import Path
 
@@ -42,6 +43,7 @@ class _FakeSMTP:
 
     def starttls(self, *a, **k):
         _FakeSMTP.captured["started_tls"] = True
+        _FakeSMTP.captured["tls_context"] = k.get("context") or (a[0] if a else None)
 
     def login(self, user, password):
         _FakeSMTP.captured["login"] = (user, password)
@@ -83,6 +85,10 @@ def test_send_email_one_recipient_with_attachment():
     cap = _FakeSMTP.captured
 
     assert cap["started_tls"] is True
+    # TLS must use a real verifying SSL context (not smtplib's context-less default).
+    assert isinstance(cap["tls_context"], ssl.SSLContext)
+    assert cap["tls_context"].verify_mode == ssl.CERT_REQUIRED
+    assert cap["tls_context"].check_hostname is True
     assert cap["login"] == ("sender@example.com", _PW)
 
     msg = cap["msg"]
@@ -96,6 +102,58 @@ def test_send_email_one_recipient_with_attachment():
     att = attachments[0]
     assert att.get_content_type() == "application/pdf"
     assert att.get_filename() == "briefs.pdf"
+
+
+def test_comma_recipient_rejected(monkeypatch):
+    monkeypatch.setenv("BRIEF_RECIPIENT", "a@x.com, b@y.com")
+    with pytest.raises(MissingSMTPConfigError):
+        load_email_config()
+    # also rejected via --to
+    with pytest.raises(MissingSMTPConfigError):
+        load_email_config(to_override="a@x.com,b@y.com")
+
+
+def test_gmail_password_spaces_stripped(monkeypatch):
+    monkeypatch.setenv("SMTP_HOST", "smtp.gmail.com")
+    monkeypatch.setenv("SMTP_PASS", "abcd efgh ijkl mnop")
+    assert load_email_config().password == "abcdefghijklmnop"
+
+
+def test_non_gmail_password_spaces_preserved(monkeypatch):
+    monkeypatch.setenv("SMTP_HOST", "smtp.fastmail.com")
+    monkeypatch.setenv("SMTP_PASS", "  pa ss wd  ")
+    # internal spaces preserved for non-Gmail; only the ends trimmed
+    assert load_email_config().password == "pa ss wd"
+
+
+def test_port_465_uses_implicit_tls(monkeypatch):
+    monkeypatch.setenv("SMTP_PORT", "465")
+    captured = {}
+
+    class _FakeSSL:
+        def __init__(self, host, port, timeout=None, context=None):
+            captured["host"] = host
+            captured["port"] = port
+            captured["context"] = context
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def login(self, u, p):
+            captured["login"] = (u, p)
+
+        def send_message(self, msg):
+            captured["sent"] = True
+
+    monkeypatch.setattr(smtplib, "SMTP_SSL", _FakeSSL)
+    cfg = load_email_config()
+    send_email(cfg, "s", "b", [("a.pdf", b"%PDF")])
+    assert captured["port"] == 465
+    assert isinstance(captured["context"], ssl.SSLContext)
+    assert captured["sent"] is True
 
 
 def test_password_never_serialized():

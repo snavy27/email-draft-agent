@@ -27,8 +27,8 @@ from claude_agent_sdk import AssistantMessage, ToolUseBlock, UserMessage
 
 import brief_agent.agent as agent
 from brief_agent.config import MissingAPIKeyError, MissingNotionTokenError, ensure_credentials
-from brief_agent.web import _to_items, format_web_context
-from eval.cases_web import WEB_CASES
+from brief_agent.web import format_web_context, validate_web_items
+from eval.cases_web import EVAL_NOW, WEB_CASES
 from eval.graders import judge_case, programmatic_grade_web
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
@@ -77,7 +77,9 @@ def _tee(*args, **kwargs):
 
 async def run_case(case, model, judge_model, sem) -> dict:
     row = {"id": case["id"], "expect": case["expect"]}
-    items = _to_items(case["web_items"])
+    # Grounding gate (Phase 8): validate against a FIXED reference date so the suite is
+    # deterministic regardless of when it runs. Only URL-bearing, in-window items are offered.
+    items = validate_web_items(case["web_items"], now=EVAL_NOW)
     web_ctx = format_web_context(items) if items else None
     web_urls = [it.url for it in items] if items else None
     cap = {"tool_calls": [], "context": []}
