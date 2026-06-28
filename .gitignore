@@ -4,8 +4,12 @@ __pycache__/
 .venv/
 venv/
 
-# Secrets / local env
+# Secrets / local env — never commit the API key, Notion token, or Google credentials
 .env
+*.key
+service-account.json
+*.service-account.json
+!.env.example
 
 # Claude Code (local, non-shared)
 CLAUDE.md

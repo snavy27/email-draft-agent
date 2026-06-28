@@ -26,6 +26,7 @@ import claude_agent_sdk
 from claude_agent_sdk import AssistantMessage, ToolUseBlock, UserMessage
 
 import brief_agent.agent as agent
+from brief_agent.config import MissingAPIKeyError, MissingNotionTokenError, ensure_credentials
 from eval.cases import CASES
 from eval.graders import judge_case, programmatic_grade
 
@@ -190,6 +191,13 @@ def main(argv=None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:  # noqa: BLE001
         pass
+
+    # Headless auth: require ANTHROPIC_API_KEY (model) + NOTION_TOKEN (CRM) before any model call.
+    try:
+        ensure_credentials()
+    except (MissingAPIKeyError, MissingNotionTokenError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
     print(f"Running eval suite on model '{args.model}' (judge '{args.judge_model}')…", file=sys.stderr)
     report = asyncio.run(run_suite(args.model, args.judge_model))

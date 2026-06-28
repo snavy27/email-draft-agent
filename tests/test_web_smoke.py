@@ -13,6 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from brief_agent.config import MissingAPIKeyError, ensure_api_key
 from brief_agent.web import gather_web_news
 from brief_agent.web import _valid_url
 
@@ -51,6 +52,11 @@ async def _run() -> int:
 
 
 def main() -> int:
+    try:
+        ensure_api_key()  # API-key-ONLY auth (this is a live, real-model test)
+    except MissingAPIKeyError as exc:
+        print(f"SKIP  web smoke — {exc}")
+        return 0
     return asyncio.run(_run())
 
 

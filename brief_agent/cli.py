@@ -18,6 +18,7 @@ from pathlib import Path
 
 from .agent import DEFAULT_MODEL, draft_brief
 from .calendar import fetch_day_events, parse_events, resolve_date
+from .config import MissingAPIKeyError, MissingNotionTokenError, ensure_credentials
 from .daily import render_packet, run_daily_briefing
 from .web import format_web_context, gather_web_news
 
@@ -221,6 +222,16 @@ def _run_calendar(args) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
+
+    # Headless auth: load .env and require BOTH ANTHROPIC_API_KEY (model) and NOTION_TOKEN (CRM)
+    # before any SDK call. No session fallback, no interactive login — fail fast with a clear,
+    # secret-free message.
+    try:
+        ensure_credentials()
+    except (MissingAPIKeyError, MissingNotionTokenError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
     if args.calendar:
         return _run_calendar(args)
     if not args.target:

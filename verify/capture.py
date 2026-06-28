@@ -31,6 +31,7 @@ from brief_agent.agent import (
     _extract_brief,
     count_body_words,
 )
+from brief_agent.config import ensure_credentials
 from brief_agent.prompt import NOTION_TASK_TEMPLATE, SYSTEM_PROMPT_NOTION
 
 
@@ -84,6 +85,7 @@ async def capture(target: str, model: str) -> dict:
 
 
 async def main() -> None:
+    ensure_credentials()  # headless auth: API key (model) + Notion token (CRM), fail fast
     target = sys.argv[1]
     model = sys.argv[2] if len(sys.argv) > 2 else "opus"
     out = sys.argv[3] if len(sys.argv) > 3 else None

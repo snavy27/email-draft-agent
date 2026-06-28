@@ -30,6 +30,7 @@ from claude_agent_sdk import AssistantMessage, ToolUseBlock, UserMessage
 import brief_agent.agent as agent
 import brief_agent.daily as daily
 from brief_agent.agent import BriefResult
+from brief_agent.config import MissingAPIKeyError, MissingNotionTokenError, ensure_credentials
 from brief_agent.calendar import parse_events
 from brief_agent.daily import _hint, _prepend_meeting_time, _stub_brief, run_daily_briefing
 from eval.cases_calendar import (
@@ -289,6 +290,13 @@ def main(argv=None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:  # noqa: BLE001
         pass
+
+    # Headless auth: require ANTHROPIC_API_KEY (model) + NOTION_TOKEN (CRM) before any model call.
+    try:
+        ensure_credentials()
+    except (MissingAPIKeyError, MissingNotionTokenError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
 
     print(f"Running CALENDAR eval on model '{args.model}' (judge '{args.judge_model}')…", file=sys.stderr)
     report = asyncio.run(run_suite(args.model, args.judge_model))

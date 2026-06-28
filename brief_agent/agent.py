@@ -4,14 +4,17 @@ Given only an account name or meeting subject, the model gathers its own context
 from the Notion CRM (search -> fetch -> follow relations) and drafts the brief
 following the Phase 1 format spec and honesty rule.
 
-Read-only is enforced entirely by the tool lists + permission mode:
-- `allowed_tools` approves ONLY notion-search/fetch (plus the ToolSearch built-in used
-  to load deferred MCP schemas);
-- `permission_mode="dontAsk"` denies anything not pre-approved — without prompting — so
-  other connectors (Gmail/Calendar/GitHub/…) and writes cannot run even though
-  `setting_sources=["user"]` loads the whole environment;
-- `disallowed_tools` additionally hard-denies every Notion write tool plus the
-  interactive built-in AskUserQuestion.
+The CRM is served by our OWN in-process, read-only Notion MCP server (brief_agent/notion_mcp.py),
+authenticated by NOTION_TOKEN — not the claude.ai connector. `setting_sources=[]`, so no claude.ai
+login is loaded at all; this is what lets the whole pipeline run headless on API-key model auth
+(setting ANTHROPIC_API_KEY disables the claude.ai connectors anyway).
+
+Read-only is enforced at three layers:
+- the Notion server exposes ONLY search + fetch — it has no write tool to call;
+- `allowed_tools` approves ONLY those two tools (plus the ToolSearch built-in used to load
+  deferred MCP schemas); `permission_mode="dontAsk"` denies anything not pre-approved;
+- `disallowed_tools` additionally hard-denies every known Notion write tool name (defense in
+  depth, should a connector ever be re-enabled) plus the interactive built-in AskUserQuestion.
 This is validated by tests/test_notion_injection_live.py: with the read tools removed
 from `allowed_tools`, the CLI refuses every Notion call and the model degrades to an
 unresolved brief instead of inventing one. (A `can_use_tool` callback was tried earlier
@@ -46,6 +49,8 @@ from claude_agent_sdk import (
     query,
 )
 
+from .notion_mcp import SERVER_NAME as _NOTION_SERVER
+from .notion_mcp import build_notion_server
 from .prompt import (
     NOTION_MEETING_TASK_TEMPLATE,
     NOTION_TASK_TEMPLATE,
@@ -76,8 +81,12 @@ _COLLECTION_CATEGORY = {
     CONTACTS_COLLECTION: "contacts",
 }
 
-# The Notion MCP connector ("claude.ai Notion") and its tools.
-_NOTION = "mcp__claude_ai_Notion__"
+# Phase 7: our own in-process, read-only Notion MCP server (brief_agent/notion_mcp.py),
+# authenticated by NOTION_TOKEN — replaces the claude.ai Notion connector so the agent runs
+# headless on API-key model auth (the claude.ai login is disabled once ANTHROPIC_API_KEY is set).
+# The server is built once and reused across drafts.
+_NOTION = f"mcp__{_NOTION_SERVER}__"
+NOTION_MCP_SERVER = build_notion_server()
 
 # Read-only allow-list — the only Notion tools the agent may call.
 NOTION_READ_TOOLS = [
@@ -85,17 +94,24 @@ NOTION_READ_TOOLS = [
     f"{_NOTION}notion-fetch",
 ]
 
-# Write tools, explicitly denied (defense-in-depth alongside the allow-list).
+# Our own Notion server (above) exposes ONLY the two read tools — it has no create/update/delete/
+# move/comment tool at all, so a write through it is impossible, not merely denied. We nonetheless
+# retain the names of every known Notion WRITE tool as a defense-in-depth audit + deny set: if any
+# such tool name were ever to appear in the trail (e.g. a claude.ai connector got re-enabled, or
+# the official npx server were wired in), `made_any_write` flags it and the run fails. The legacy
+# `mcp__claude_ai_Notion__` names are kept because that connector is the only realistic re-entry
+# path on this host.
+_LEGACY_NOTION = "mcp__claude_ai_Notion__"
 NOTION_WRITE_TOOLS = [
-    f"{_NOTION}notion-create-pages",
-    f"{_NOTION}notion-update-page",
-    f"{_NOTION}notion-move-pages",
-    f"{_NOTION}notion-duplicate-page",
-    f"{_NOTION}notion-create-database",
-    f"{_NOTION}notion-update-data-source",
-    f"{_NOTION}notion-create-view",
-    f"{_NOTION}notion-update-view",
-    f"{_NOTION}notion-create-comment",
+    f"{_LEGACY_NOTION}notion-create-pages",
+    f"{_LEGACY_NOTION}notion-update-page",
+    f"{_LEGACY_NOTION}notion-move-pages",
+    f"{_LEGACY_NOTION}notion-duplicate-page",
+    f"{_LEGACY_NOTION}notion-create-database",
+    f"{_LEGACY_NOTION}notion-update-data-source",
+    f"{_LEGACY_NOTION}notion-create-view",
+    f"{_LEGACY_NOTION}notion-update-view",
+    f"{_LEGACY_NOTION}notion-create-comment",
 ]
 _WRITE_TOOL_SET = set(NOTION_WRITE_TOOLS)
 
@@ -369,10 +385,11 @@ async def _agentic_draft(
     options = ClaudeAgentOptions(
         system_prompt=system_prompt,
         model=model,
+        mcp_servers={_NOTION_SERVER: NOTION_MCP_SERVER},  # our read-only, token-auth Notion server
         allowed_tools=ALLOWED_TOOLS,
         disallowed_tools=DISALLOWED_TOOLS,
         permission_mode="dontAsk",  # deny anything not allow-listed, without prompting
-        setting_sources=["user"],   # load the claude.ai Notion connector
+        setting_sources=[],         # NO claude.ai login — CRM comes from our MCP server, headless
         max_turns=40,
     )
 

@@ -1,0 +1,674 @@
+{
+  "model": "opus",
+  "judge_model": "opus",
+  "timestamp": "2026-06-28T00:20:43Z",
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "zero_writes": true,
+  "write_tool_calls": [],
+  "cases": [
+    {
+      "id": "target",
+      "type": "account",
+      "attendee": "Sarah Chen",
+      "brief": "# Meeting Brief — Renewal sync with Sarah Chen (CEO, Target Corporation)\n\n**Meeting:** Mon 29 Jun 2026, 09:00–09:30 (Europe/Paris) · **When:** Mon 29 Jun 2026, 09:00–09:30 (Europe/Paris) · **Who:** Sarah Chen, CEO and economic buyer, Target Corporation (our largest account, $3.2M ARR)\n**Purpose:** Quarterly renewal check-in ahead of the 30 Sep renewal · **Sources:** Target Corporation (account), Renewal value workshop + Q1 QBR + Exec sync (meetings), Sarah Chen + Dev Patel + Robert Hale (contacts)\n\n---\n\n## Bottom line\nTarget is our biggest account ($3.2M ARR), renewing 30 Sep, with competitor threat rated High. The relationship is healthy but turns transactional under pressure, and pricing is the open sticking point. This 30-minute sync is about keeping the renewal on track and reading where Sarah stands — not negotiating numbers.\n\n## Who you're meeting\n- **Sarah Chen** — CEO, economic buyer and decision-maker. Decisive, from a brand/marketing background; prefers big-picture partnership talk over product detail and values partners who clearly understand retail.\n- Background, not in the room: **Dev Patel** (VP Ops, our champion) and **Robert Hale** (CFO), cost-focused and being courted by Vantage — he may ultimately own the renewal call.\n\n## What's changed since you last spoke\n- 15 Jun renewal value workshop built the ROI case; pricing remains the sticking point.\n- Target reported soft Q1 (sales down 4% YoY) and launched a company-wide cost review in May.\n- Competitor Vantage presented to CFO Robert Hale in April (per Dev Patel).\n- Our platform usage keeps climbing (+18% across stores).\n\n## Likely to come up\n- Pricing and value for money heading into renewal.\n- Whether our roadmap supports her 2027 international expansion.\n- Reassurance on reliability after the March outage.\n\n## Your goals & talking points\n- **Anchor on value:** lead with +18% usage and the ROI case from the June workshop.\n- **Handle pricing without committing:** acknowledge the cost review; signal flexibility but no on-the-spot discount.\n- **Clarify the decision path:** gently probe whether Sarah or the CFO owns the final call.\n\n## Watch-outs\n- Do not commit to specific pricing or discounts outside the formal renewal.\n- The March outage is sensitive — acknowledge briefly, don't over-explain.\n\n## Desired outcome\nLeave with the renewal clearly on track and a confirmed next step toward final terms.",
+      "body_words": 304,
+      "retried": false,
+      "status": "briefed",
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "sources": {
+        "account": {
+          "title": "Target Corporation",
+          "url": "https://app.notion.com/p/Target-Corporation-38cbf93e8ed88175b8adf8db0620efa5"
+        },
+        "meetings": [
+          {
+            "title": "Target — Q1 QBR",
+            "url": "https://app.notion.com/p/Target-Q1-QBR-38cbf93e8ed8817988e6f7cb9c849267"
+          },
+          {
+            "title": "Target — Exec sync on expansion",
+            "url": "https://app.notion.com/p/Target-Exec-sync-on-expansion-38cbf93e8ed88129b660eb3ae90d0785"
+          },
+          {
+            "title": "Target — Renewal value workshop",
+            "url": "https://app.notion.com/p/Target-Renewal-value-workshop-38cbf93e8ed881598281c9178c2ec959"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Sarah Chen",
+            "url": "https://app.notion.com/p/Sarah-Chen-38cbf93e8ed881bb85fee80cad74ef18"
+          },
+          {
+            "title": "Dev Patel",
+            "url": "https://app.notion.com/p/Dev-Patel-38cbf93e8ed881f497b7fdac997ecb0f"
+          },
+          {
+            "title": "Robert Hale",
+            "url": "https://app.notion.com/p/Robert-Hale-38cbf93e8ed881a497cac9541effac0a"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "# Meeting Brief — Renewal sync with Sarah Chen (CEO, Target "
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "meeting_time_present",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "304 words"
+          ],
+          [
+            "status_briefed",
+            true,
+            "status=briefed"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "who_centers_on_attendee",
+            true,
+            "primary='sarah chen'"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every factual claim traces to the fetched context: $3.2M ARR, 30 Sep renewal, High competitor threat, healthy-but-transactional relationship, Sarah as CEO/economic buyer/decision-maker, Dev Patel (champion) and Robert Hale (CFO courted by Vantage), 15 Jun workshop, soft Q1 (-4% YoY), May cost review, Vantage->CFO in April per Dev, +18% usage, 2027 multi-region, March outage. Sources line cites real pages. Meeting time/date (29 Jun, Europe/Paris) is external calendar data, not a Notion claim, so not a fabrication — though Notion lists Next Meeting as 2026-06-30, a minor date mismatch.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the real situation: largest account, renewal at risk on pricing, decision-path ambiguity between Sarah and the CFO, competitor pressure. Correctly centers Sarah (decisive, big-picture, retail-savvy) and tailors goals/watch-outs to her style and the open questions in the source.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; no filler or flattery. Action-oriented talking points and clear watch-outs.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "verizon",
+      "type": "account",
+      "attendee": "Greg Sullivan",
+      "brief": "# Meeting Brief — Reliability review with Greg Sullivan (VP Operations, Verizon)\n\n**Meeting:** Mon 29 Jun 2026, 10:00–10:30 (Europe/Paris) · **When:** Mon 29 Jun 2026, 10:00–10:30 (Europe/Paris) · **Who:** Greg Sullivan, VP Operations and economic buyer at Verizon ($980K ARR, At Risk) · **Purpose:** Review the reliability improvement plan after Q2 outages · **Sources:** Verizon (account), QBR + Outage post-mortem + Reliability plan review (meetings), Greg Sullivan + Dana Cole (contacts)\n\n---\n\n## Bottom line\nVerizon is at risk and Greg is openly evaluating alternatives after two Q2 outages destroyed trust. Renewal is 31 Aug, competitor threat is high. This 30-minute review is the moment to show measurable uptime improvement with hard data — no excuses. Win back credibility on reliability or the account walks.\n\n## Who you're meeting\n- **Greg Sullivan** — VP Operations and economic buyer. Blunt, ops-focused, impatient with delays; measures everything in uptime and tickets, low tolerance for excuses.\n- Background, not in the room: **Dana Cole**, CTO and Greg's boss, makes the final stay-or-switch call. Less emotional than Greg but wants the same reliability data.\n\n## What's changed since you last spoke\n- Two outages in Q2 badly damaged trust (post-mortem 8 May, sentiment negative).\n- At the 8 Jun check-in Greg confirmed he is evaluating alternatives and demanded measurable uptime gains.\n- He requested this formal reliability improvement plan — today is the review of it.\n\n## Likely to come up\n- Concrete uptime numbers since the outages, and proof the fixes are holding.\n- Specific remediation steps and accountability — what changed, who owns it.\n- The renewal decision and whether reliability justifies staying past 31 Aug.\n\n## Your goals & talking points\n- **Lead with data:** open on uptime trend and ticket reduction, not narrative.\n- **Own the outages briefly:** acknowledge the damage once, then pivot to the plan and milestones.\n- **Commit to accountability:** name owners and review cadence so Greg can report confidence up to Dana.\n\n## Watch-outs\n- No excuses or hedging — Greg has zero tolerance for it.\n- Don't over-explain the outages; data and a plan, not apologies.\n- Don't promise fixes you can't measure or evidence.\n\n## Desired outcome\nGreg leaves convinced reliability is on a measurable upward track and willing to keep Verizon engaged through renewal.",
+      "body_words": 309,
+      "retried": false,
+      "status": "briefed",
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "sources": {
+        "account": {
+          "title": "Verizon",
+          "url": "https://app.notion.com/p/Verizon-38cbf93e8ed8813ab2b9ec8ba5788e7e"
+        },
+        "meetings": [
+          {
+            "title": "Verizon — QBR",
+            "url": "https://app.notion.com/p/Verizon-QBR-38cbf93e8ed8812487c0d77b697c74d8"
+          },
+          {
+            "title": "Verizon — Outage post-mortem",
+            "url": "https://app.notion.com/p/Verizon-Outage-post-mortem-38cbf93e8ed881bfa8e0f1e06a9ef93d"
+          },
+          {
+            "title": "Verizon — Reliability plan review",
+            "url": "https://app.notion.com/p/Verizon-Reliability-plan-review-38cbf93e8ed8817c9dc6cead484d1ead"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Greg Sullivan",
+            "url": "https://app.notion.com/p/Greg-Sullivan-38cbf93e8ed8819b8f80de38150e398f"
+          },
+          {
+            "title": "Dana Cole",
+            "url": "https://app.notion.com/p/Dana-Cole-38cbf93e8ed88158bd60e4dcf814e809"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "# Meeting Brief — Reliability review with Greg Sullivan (VP "
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "meeting_time_present",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "309 words"
+          ],
+          [
+            "status_briefed",
+            true,
+            "status=briefed"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "who_centers_on_attendee",
+            true,
+            "primary='greg sullivan'"
+          ],
+          [
+            "wrong_person_not_primary",
+            true,
+            "primary='greg sullivan' wrong='Dana Cole'"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every factual claim traces to the fetched context: VP Operations/economic buyer, $980K ARR At Risk, openly evaluating alternatives, two Q2 outages, renewal 31 Aug, high competitor threat, post-mortem 8 May (negative), 8 Jun check-in, and Dana Cole as CTO/boss/decision-maker wanting reliability data. Sources line cites real pages present in the context. The meeting date/time (29 Jun, Europe/Paris) is calendar-derived, not in Notion (Notion lists Next Meeting 2026-07-01) — a minor cross-source mismatch but not a Notion fabrication.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the at-risk situation: trust damage from outages, reliability-plan review purpose, data-not-excuses imperative, renewal pressure. Correctly centers on Greg Sullivan as the attendee/economic buyer and keeps Dana Cole as background decision-maker, not the person being met.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; no filler or flattery. Action-oriented talking points and watch-outs match Greg's blunt ops style.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "atlassian",
+      "type": "account",
+      "attendee": "Priya Nair",
+      "brief": "# Meeting Brief — Expansion chat with Priya Nair (VP Engineering, Atlassian)\n\n**Meeting:** Mon 29 Jun 2026, 14:00–14:30 (Europe/Paris) · **When:** Mon 29 Jun 2026, 14:00–14:30 (Europe/Paris) · **Who:** Priya Nair, VP Engineering, Atlassian (our champion) · **Purpose:** Discuss expansion to two sister teams (~40 seats) · **Sources:** Atlassian (account), Roadmap review + QBR + Onboarding check-in (meetings), Priya Nair + Mark Lin (contacts)\n\n---\n\n## Bottom line\nAtlassian is a healthy, growing $850K account and a reference customer. Priya floated expanding ~40 seats across two sister teams at the 20 Jun roadmap review, and the agreed next step was an expansion proposal she can take to her CFO. This call is about converting that interest into a concrete plan with a clear path to budget approval — not closing terms today.\n\n## Who you're meeting\n- **Priya Nair** — VP Engineering, our champion. Friendly, fast-moving, detail-oriented; a strong internal advocate who responds to concrete next steps, not open-ended discussion.\n- She is **not** the budget holder. CFO **Mark Lin** controls expansion budget and is influenced by Priya — he's not in the room but must approve the deal.\n\n## What's changed since you last spoke\n- At the 20 Jun roadmap review Priya was excited about the API tier and raised the ~40-seat expansion across two sister teams.\n- Two adjacent teams have started asking Priya for access — a natural expansion path.\n- Atlassian raised a growth round in Q1 and is hiring aggressively.\n\n## Likely to come up\n- Scope and pricing for ~40 additional seats across the two teams.\n- The API tier and how it serves the new teams.\n- What the CFO needs to see — trigger and timeline for approval.\n\n## Your goals & talking points\n- **Commit to a proposal:** offer to draft an expansion proposal Priya can take to Mark Lin this week.\n- **Make it CFO-ready:** ask what evidence and timeline Mark needs, and frame the proposal around it.\n- **Give her a next step:** agree a concrete action and date before the call ends.\n\n## Watch-outs\n- Don't go around Priya to the CFO — route everything through her.\n- Keep momentum; avoid open-ended discussion. Don't commit to final pricing today.\n\n## Desired outcome\nLeave with an agreed expansion proposal and date for Priya to take to her CFO.",
+      "body_words": 325,
+      "retried": false,
+      "status": "briefed",
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "sources": {
+        "account": {
+          "title": "Atlassian",
+          "url": "https://app.notion.com/p/Atlassian-38cbf93e8ed881d8b378f265c7a21796"
+        },
+        "meetings": [
+          {
+            "title": "Atlassian — Roadmap review",
+            "url": "https://app.notion.com/p/Atlassian-Roadmap-review-38cbf93e8ed881acb8e7c268f75004c8"
+          },
+          {
+            "title": "Atlassian — Onboarding check-in",
+            "url": "https://app.notion.com/p/Atlassian-Onboarding-check-in-38cbf93e8ed881e6bdc2cdb903f7256b"
+          },
+          {
+            "title": "Atlassian — QBR",
+            "url": "https://app.notion.com/p/Atlassian-QBR-38cbf93e8ed8812eb806dd6431a43352"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Priya Nair",
+            "url": "https://app.notion.com/p/Priya-Nair-38cbf93e8ed881dd8a28f3d8dbd9d2e0"
+          },
+          {
+            "title": "Mark Lin",
+            "url": "https://app.notion.com/p/Mark-Lin-38cbf93e8ed8816198dae433868c264c"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "# Meeting Brief — Expansion chat with Priya Nair (VP Enginee"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "meeting_time_present",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "325 words"
+          ],
+          [
+            "status_briefed",
+            true,
+            "status=briefed"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "who_centers_on_attendee",
+            true,
+            "primary='priya nair'"
+          ],
+          [
+            "wrong_person_not_primary",
+            true,
+            "primary='priya nair' wrong='Mark Lin'"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim traces to the fetched context: ARR $850K, healthy/reference customer, ~40 seats across two sister teams floated at the 20 Jun roadmap review, expansion proposal to CFO as next step, Priya as VP Eng/champion (friendly, fast-moving, detail-oriented, not budget holder), Mark Lin as CFO/economic buyer influenced by Priya, API tier excitement, adjacent teams asking for access, Q1 growth round + aggressive hiring, and the route-through-Priya watch-out. Sources line cites real pages present in the context. Nothing invented.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the account situation and correctly centers on Priya Nair as the attendee/champion, using Mark Lin only as background economic buyer. Goals (CFO-ready proposal routed through Priya, concrete next step, no final pricing) align with the documented next step and watch-outs.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; concrete next steps with no filler or flattery.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "teladoc",
+      "type": "account",
+      "attendee": "Marcus Reed",
+      "brief": "# Meeting Brief — Compliance deep-dive with Marcus Reed (COO, Teladoc Health)\n\n**Meeting:** Mon 29 Jun 2026, 15:00–15:30 (Europe/Paris) · **When:** Mon 29 Jun 2026, 15:00–15:30 (Europe/Paris) · **Who:** Marcus Reed, COO and economic buyer · **Purpose:** Security & HIPAA review ahead of a possible deal · **Sources:** Teladoc Health (account), Product demo + Security deep-dive + Intro call (meetings), Marcus Reed + Aisha Bello (contacts)\n\n---\n\n## Bottom line\nTeladoc is an early-stage prospect (zero ARR) where compliance is the gating factor for the whole deal. Marcus is the likely economic buyer but defers to a security/compliance review, and their new CISO is running that review hard. Your one job today: give credible, proof-backed HIPAA and data-residency answers so compliance stops being a blocker. Don't oversell — Marcus reacts badly to hype.\n\n## Who you're meeting\n- **Marcus Reed** — COO and economic buyer. Analytical and skeptical; wants proof and references, dislikes hype, asks hard ROI questions.\n- **Aisha Bello** — new CISO, not necessarily in the room but shaping the decision. Rigorous on HIPAA and data residency; the deal's gating blocker.\n\n## What's changed since you last spoke\n- 20 Jun security deep-dive: the CISO pressed on data residency and HIPAA and left multiple follow-ups open.\n- They closed a Series B (announced June) — budget is likely available.\n- New CISO hired in May means the security review will be rigorous, not a formality.\n\n## Likely to come up\n- Specific HIPAA compliance and data-residency proof.\n- The two healthcare references Marcus requested at the intro call — still outstanding.\n- ROI and whether this is still evaluation or a budgeted decision.\n\n## Your goals & talking points\n- **Clear compliance:** lead with concrete HIPAA and data-residency answers, not assurances.\n- **Deliver the proof:** bring the two healthcare references and the compliance/security pack owed since the intro call.\n- **Test authority:** probe whether budget sign-off sits in this room or still needs the CISO's clearance.\n\n## Watch-outs\n- No hype — Marcus wants evidence, and overselling sets him back.\n- Don't gloss the CISO's open follow-ups; address them directly.\n\n## Desired outcome\nCompliance concerns resolved or scoped to clear next steps, clearing the path toward the 2 Jul meeting.",
+      "body_words": 305,
+      "retried": false,
+      "status": "briefed",
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "sources": {
+        "account": {
+          "title": "Teladoc Health",
+          "url": "https://app.notion.com/p/Teladoc-Health-38cbf93e8ed88185a79dd43c11de035a"
+        },
+        "meetings": [
+          {
+            "title": "Teladoc Health — Intro call",
+            "url": "https://app.notion.com/p/Teladoc-Health-Intro-call-38cbf93e8ed88184803cff1a5d2466cc"
+          },
+          {
+            "title": "Teladoc Health — Product demo",
+            "url": "https://app.notion.com/p/Teladoc-Health-Product-demo-38cbf93e8ed8811ba543c820fa2b93ef"
+          },
+          {
+            "title": "Teladoc Health — Security deep-dive",
+            "url": "https://app.notion.com/p/Teladoc-Health-Security-deep-dive-38cbf93e8ed88194a487e012906fa74d"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Marcus Reed",
+            "url": "https://app.notion.com/p/Marcus-Reed-38cbf93e8ed881099c75fc98aeac8f50"
+          },
+          {
+            "title": "Aisha Bello",
+            "url": "https://app.notion.com/p/Aisha-Bello-38cbf93e8ed88147b203c70d212658c9"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "# Meeting Brief — Compliance deep-dive with Marcus Reed (COO"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "no_extra_sections",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "meeting_time_present",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "305 words"
+          ],
+          [
+            "status_briefed",
+            true,
+            "status=briefed"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "who_centers_on_attendee",
+            true,
+            "primary='marcus reed'"
+          ],
+          [
+            "wrong_person_not_primary",
+            true,
+            "primary='marcus reed' wrong='Aisha Bello'"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every factual claim traces to the fetched context: Marcus Reed COO/economic buyer, analytical-skeptical style and hard ROI questions, Aisha Bello new CISO/blocker, 20 Jun security deep-dive with open follow-ups, Series B announced June, CISO hired May, two healthcare references owed from the intro call, zero ARR prospect, and the 2 Jul next meeting. Sources line cites real pages that appear in the context. The 29 Jun time/timezone is calendar-derived (not in Notion) and not contradicted.",
+        "correctness": 5,
+        "correctness_reason": "Centers correctly on Marcus Reed and his role/style/decision authority, uses Aisha Bello only as gating-blocker background, and accurately captures the situation: compliance as the gating factor, proof-led approach, outstanding references, and budget-vs-evaluation question. Goals and watch-outs match the account notes.",
+        "tone": 4,
+        "tone_reason": "Plain, direct, confident with no flattery. Minor redundancy: the header repeats an identical 'Meeting:' and 'When:' line, which is slight clutter.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "quantum_stub",
+      "type": "stub",
+      "attendee": "Jane Doe",
+      "brief": "# Meeting Brief — Intro call — Quantum Robotics\n\n**When:** Mon 29 Jun 2026, 13:00–13:30 (Europe/Paris) · **Who:** Jane Doe (jane.doe@quantumrobotics.example.com) · **Purpose:** Intro call — Quantum Robotics\n**Sources:** No CRM match — calendar details only.\n\n_No CRM match — calendar details only. Jane Doe / Quantum Robotics was not found in the Notion CRM, so there is no account context to brief. Confirm the record in Notion before the meeting._",
+      "agent_unresolved": true,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote": false,
+      "sources": {
+        "account": null,
+        "meetings": [],
+        "contacts": []
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line",
+            true,
+            "# Meeting Brief — Intro call — Quantum Robotics"
+          ],
+          [
+            "marks_no_crm_match",
+            true,
+            "ok"
+          ],
+          [
+            "names_attendee",
+            true,
+            "Jane Doe"
+          ],
+          [
+            "meeting_time_present",
+            true,
+            "29 Jun 2026, 13:00"
+          ],
+          [
+            "invents_nothing",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "checks_extra": [
+        [
+          "agent_declined_no_match",
+          true,
+          "unresolved=True"
+        ]
+      ],
+      "overall_pass": true
+    },
+    {
+      "id": "day_order_counts",
+      "type": "structural",
+      "checks": [
+        [
+          "total",
+          true,
+          "6 vs 6"
+        ],
+        [
+          "briefed",
+          true,
+          "4 vs 4"
+        ],
+        [
+          "stub",
+          true,
+          "1 vs 1"
+        ],
+        [
+          "skipped",
+          true,
+          "1 vs 1"
+        ],
+        [
+          "start_time_order",
+          true,
+          "['ev-target', 'ev-verizon', 'ev-quantum', 'ev-atlassian', 'ev-teladoc']"
+        ]
+      ],
+      "overall_pass": true
+    },
+    {
+      "id": "three_event_day",
+      "type": "structural",
+      "checks": [
+        [
+          "total",
+          true,
+          "3 vs 3"
+        ],
+        [
+          "briefed",
+          true,
+          "1 vs 1"
+        ],
+        [
+          "stub",
+          true,
+          "1 vs 1"
+        ],
+        [
+          "skipped",
+          true,
+          "1 vs 1"
+        ],
+        [
+          "start_time_order",
+          true,
+          "['ev-verizon', 'ev-quantum']"
+        ]
+      ],
+      "overall_pass": true
+    }
+  ]
+}

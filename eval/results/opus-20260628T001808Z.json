@@ -1,0 +1,763 @@
+{
+  "model": "opus",
+  "judge_model": "opus",
+  "timestamp": "2026-06-28T00:18:08Z",
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "cases": [
+    {
+      "id": "target",
+      "input": "Target Corporation",
+      "kind": "account",
+      "note": "healthy / renewal",
+      "brief": "# Meeting Brief — Target Corporation (Sarah Chen, CEO)\n\n**When:** Tue 30 Jun 2026 · **Who:** Sarah Chen, CEO of Target Corporation (our largest account) · **Purpose:** Renewal-period relationship and value conversation ahead of the 30 Sep renewal · **Sources:** Target Corporation (account); Q1 QBR + Renewal value workshop + Exec sync on expansion (meetings); Sarah Chen + Dev Patel + Robert Hale (contacts)\n\n---\n\n## Bottom line\nTarget is our biggest account ($3.2M ARR), up for renewal on 30 Sep. The relationship is Healthy but turning transactional: Sarah raised pricing/value concerns for the first time at the Q1 QBR, and competitor Vantage has been courting the CFO. Today is about reinforcing the partnership and tightening the ROI case — not negotiating price.\n\n## Who you're meeting\n- **Sarah Chen** — CEO, economic buyer and decision-maker. Decisive, from brand/marketing; prefers big-picture partnership talk over product detail. Values partners who understand retail.\n- **Dev Patel** (VP Ops) — our champion, feeds us intel on the CFO and competitor.\n- **Robert Hale** (CFO) — cost-focused, courted by Vantage; may own the renewal decision.\n\n## What's changed since you last spoke\n- Renewal value workshop (15 Jun) built the ROI case; pricing remains the sticking point.\n- Target reported soft Q1 (sales down 4% YoY) and launched a cost-review program in May.\n- Vantage presented to the CFO in April (per Dev Patel).\n- Platform usage continues to climb, up 18% across stores.\n\n## Likely to come up\n- Pricing and value heading into the September renewal.\n- Whether our roadmap supports her 2027 international expansion.\n- The March outage — she may seek reassurance.\n\n## Your goals & talking points\n- **Reaffirm the partnership:** lead with the 18% usage growth and strong adoption.\n- **Address pricing pre-emptively:** acknowledge the cost review; signal flexible options without discounting on the spot.\n- **Plant the roadmap:** tie multi-region capability to her expansion ambitions.\n- **Clarify the decision path:** probe gently whether Sarah or the CFO owns renewal.\n\n## Watch-outs\n- Don't commit to specific pricing or discounts outside the formal renewal.\n- The March outage is sensitive — acknowledge briefly, don't over-explain.\n\n## Desired outcome\nLeave with Sarah's confidence in the partnership intact and a clear next step toward renewal terms.",
+      "body_words": 311,
+      "retried": false,
+      "unresolved": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": {
+          "title": "Target Corporation",
+          "url": "https://app.notion.com/p/Target-Corporation-38cbf93e8ed88175b8adf8db0620efa5"
+        },
+        "meetings": [
+          {
+            "title": "Target — Q1 QBR",
+            "url": "https://app.notion.com/p/Target-Q1-QBR-38cbf93e8ed8817988e6f7cb9c849267"
+          },
+          {
+            "title": "Target — Exec sync on expansion",
+            "url": "https://app.notion.com/p/Target-Exec-sync-on-expansion-38cbf93e8ed88129b660eb3ae90d0785"
+          },
+          {
+            "title": "Target — Renewal value workshop",
+            "url": "https://app.notion.com/p/Target-Renewal-value-workshop-38cbf93e8ed881598281c9178c2ec959"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Sarah Chen",
+            "url": "https://app.notion.com/p/Sarah-Chen-38cbf93e8ed881bb85fee80cad74ef18"
+          },
+          {
+            "title": "Dev Patel",
+            "url": "https://app.notion.com/p/Dev-Patel-38cbf93e8ed881f497b7fdac997ecb0f"
+          },
+          {
+            "title": "Robert Hale",
+            "url": "https://app.notion.com/p/Robert-Hale-38cbf93e8ed881a497cac9541effac0a"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Target Corporation (Sarah Chen, CEO)'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "311 words"
+          ],
+          [
+            "not_unresolved",
+            true,
+            "unresolved=False"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim traces to the fetched context: $3.2M ARR, 30 Sep renewal, Healthy status, +18% usage, Sarah's Q1 pricing concerns, Vantage courting the CFO (per Dev Patel), soft Q1 -4% YoY, May cost review, 15 Jun workshop, March outage, 2027 expansion, contact roles/styles. Sources line cites real pages that appear in context. 'Economic buyer and decision-maker' for Sarah is supported verbatim by the account relationship notes. No inventions.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the real situation: largest healthy-but-transactional account up for renewal, pricing as the live tension, competitor threat via the CFO, and correct strategic posture (reinforce partnership/ROI, don't negotiate price, clarify decision owner). Surfaces the open question of whether Sarah or the CFO owns the renewal — matching context.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident. No filler or flattery; talking points and watch-outs are concise and actionable.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "verizon",
+      "input": "Verizon",
+      "kind": "account",
+      "note": "at-risk / outages",
+      "brief": "# Meeting Brief — Verizon (Greg Sullivan, VP Operations)\n\n**When:** Wed 1 Jul 2026 · **Who:** Greg Sullivan, VP Operations (economic buyer) · **Purpose:** Recover an at-risk account ahead of the 31 Aug renewal · **Sources:** Verizon (account), QBR + Outage post-mortem + Reliability plan review (meetings), Greg Sullivan + Dana Cole (contacts)\n\n---\n\n## Bottom line\nVerizon ($980K ARR) is At Risk and up for renewal 31 Aug. Two Q2 outages badly damaged trust, and Greg is openly evaluating alternatives — competitor threat is High. This meeting is about one thing: showing measurable uptime improvement with hard data and a credible reliability plan. No excuses, no vague reassurance.\n\n## Who you're meeting\n- **Greg Sullivan** — VP Operations, economic buyer. Blunt, ops-focused, impatient with delays. Measures everything in uptime and tickets; low tolerance for excuses.\n- **Dana Cole** (CTO, decision-maker) — Greg's boss, makes the stay-or-switch call. Less emotional than Greg but wants the reliability data. May not attend, but you are speaking to her through Greg.\n\n## What's changed since you last spoke\n- Two outages in Q2 hurt trust badly; sentiment has been negative since May.\n- At the 8 Jun check-in Greg said he is openly evaluating alternatives.\n- Greg requested a formal reliability improvement plan — the agreed next step.\n\n## Likely to come up\n- Concrete uptime numbers since the last outage and whether the issues are fixed.\n- The formal reliability improvement plan he asked for.\n- Whether to renew, and on what terms, given the competitor in play.\n\n## Your goals & talking points\n- **Lead with data:** open with uptime metrics and ticket trends, not narrative.\n- **Deliver the plan:** present the reliability improvement plan with owners and dates.\n- **Protect the renewal:** tie demonstrated progress to a confident path to 31 Aug.\n\n## Watch-outs\n- No excuses — data and a plan only; he has no patience for justification.\n- Don't over-promise fixes you can't measure or commit dates you can't hit.\n\n## Desired outcome\nGreg accepts the reliability plan as sufficient to pause his evaluation and move toward renewal.",
+      "body_words": 296,
+      "retried": false,
+      "unresolved": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": {
+          "title": "Verizon",
+          "url": "https://app.notion.com/p/Verizon-38cbf93e8ed8813ab2b9ec8ba5788e7e"
+        },
+        "meetings": [
+          {
+            "title": "Verizon — QBR",
+            "url": "https://app.notion.com/p/Verizon-QBR-38cbf93e8ed8812487c0d77b697c74d8"
+          },
+          {
+            "title": "Verizon — Outage post-mortem",
+            "url": "https://app.notion.com/p/Verizon-Outage-post-mortem-38cbf93e8ed881bfa8e0f1e06a9ef93d"
+          },
+          {
+            "title": "Verizon — Reliability plan review",
+            "url": "https://app.notion.com/p/Verizon-Reliability-plan-review-38cbf93e8ed8817c9dc6cead484d1ead"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Greg Sullivan",
+            "url": "https://app.notion.com/p/Greg-Sullivan-38cbf93e8ed8819b8f80de38150e398f"
+          },
+          {
+            "title": "Dana Cole",
+            "url": "https://app.notion.com/p/Dana-Cole-38cbf93e8ed88158bd60e4dcf814e809"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Verizon (Greg Sullivan, VP Operations)'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "296 words"
+          ],
+          [
+            "not_unresolved",
+            true,
+            "unresolved=False"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every factual claim traces to the context: $980K ARR, At Risk, 31 Aug renewal, two Q2 outages, Greg openly evaluating alternatives, High competitor threat, Greg as VP Ops/economic buyer with blunt ops-focused style, Dana Cole as CTO/decision-maker and Greg's boss who makes the stay-or-switch call, negative sentiment since the 8 May post-mortem, 8 Jun check-in, requested reliability plan, and meeting date 1 Jul. Sources line cites the real account, three meetings, and two contacts. No inventions; 'speaking to her through Greg' is a fair inference, not a fabricated fact.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the real situation — at-risk renewal driven by two outages, Greg evaluating alternatives, the demanded reliability plan and data-first/no-excuses posture — and turns it into useful, correctly prioritized guidance (lead with data, deliver the plan, protect the renewal). Correctly surfaces Dana as the ultimate decision-maker.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident. No filler or flattery; talking points are concrete and match Greg's blunt, uptime-and-tickets style.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "atlassian",
+      "input": "Atlassian",
+      "kind": "account",
+      "note": "expansion",
+      "brief": "# Meeting Brief — Atlassian (Priya Nair, VP Engineering)\n\n**When:** Wed 8 Jul 2026 · **Who:** Priya Nair, VP Engineering & champion · **Purpose:** Advance the ~40-seat expansion across two sister teams · **Sources:** Atlassian (account), Roadmap review + QBR + Onboarding check-in (meetings), Priya Nair + Mark Lin (contacts)\n\n---\n\n## Bottom line\nAtlassian is a healthy, growing $850K reference account with a clear expansion in front of us: Priya wants to add ~40 seats across two adjacent teams. She's an enthusiastic champion but not the budget holder — CFO Mark Lin is. This meeting is about converting her enthusiasm into a concrete proposal she can carry to Mark, and pinning down the approval trigger and timeline.\n\n## Who you're meeting\n- **Priya Nair** — VP Engineering, champion-level advocate. Friendly, fast-moving, detail-oriented; responds to concrete next steps, not open-ended discussion.\n\n## What's changed since you last spoke\n- At the 20 Jun roadmap review, Priya was excited about the API tier and floated ~40 seats across two sister teams.\n- Two adjacent teams have started asking her about access — a natural expansion path.\n- Atlassian raised a growth round in Q1 and is hiring aggressively.\n\n## Likely to come up\n- Pricing and packaging for the additional ~40 seats.\n- The API tier and how it fits the sister teams' needs.\n- What Mark Lin (CFO) will need to approve the spend.\n\n## Your goals & talking points\n- **Deliver the expansion proposal:** bring a concrete draft Priya can take straight to the CFO.\n- **Map the approval path:** ask directly what triggers and timeline Mark needs to sign off.\n- **Reinforce the API tier:** tie it to the two sister teams' adoption to justify the seats.\n\n## Watch-outs\n- Don't go around Priya to the CFO — route everything through her.\n- Keep it concrete and moving; avoid open-ended discussion she'll find unproductive.\n\n## Desired outcome\nPriya leaves with an expansion proposal in hand and a committed next step and timeline for CFO approval.",
+      "body_words": 286,
+      "retried": false,
+      "unresolved": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": {
+          "title": "Atlassian",
+          "url": "https://app.notion.com/p/Atlassian-38cbf93e8ed881d8b378f265c7a21796"
+        },
+        "meetings": [
+          {
+            "title": "Atlassian — Roadmap review",
+            "url": "https://app.notion.com/p/Atlassian-Roadmap-review-38cbf93e8ed881acb8e7c268f75004c8"
+          },
+          {
+            "title": "Atlassian — Onboarding check-in",
+            "url": "https://app.notion.com/p/Atlassian-Onboarding-check-in-38cbf93e8ed881e6bdc2cdb903f7256b"
+          },
+          {
+            "title": "Atlassian — QBR",
+            "url": "https://app.notion.com/p/Atlassian-QBR-38cbf93e8ed8812eb806dd6431a43352"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Priya Nair",
+            "url": "https://app.notion.com/p/Priya-Nair-38cbf93e8ed881dd8a28f3d8dbd9d2e0"
+          },
+          {
+            "title": "Mark Lin",
+            "url": "https://app.notion.com/p/Mark-Lin-38cbf93e8ed8816198dae433868c264c"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Atlassian (Priya Nair, VP Engineering)'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "286 words"
+          ],
+          [
+            "not_unresolved",
+            true,
+            "unresolved=False"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every specific claim traces to the context: $850K ARR, Healthy, reference customer, ~40 seats across two sister teams, API tier, 20 Jun roadmap review, Q1 growth round and aggressive hiring, Priya as VP Engineering champion/non-budget-holder, Mark Lin as CFO/economic buyer, and the 2026-07-08 next meeting. Sources line cites real pages (account, three meetings, two contacts) that all appear in the context. No invented specifics; 'likely to come up' items are flagged as inferences, not asserted facts.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the account's real situation: expansion opportunity, Priya as champion who must route to CFO Mark Lin, the open question about CFO approval trigger/timeline, and the watch-outs (stay concrete, don't bypass Priya). Goals align with the recorded next step ('draft an expansion proposal Priya can take to the CFO'). Useful and faithful.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident. No filler or flattery; bottom line is crisp and action-oriented.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "teladoc",
+      "input": "Teladoc Health",
+      "kind": "account",
+      "note": "prospect / compliance",
+      "brief": "# Meeting Brief — Teladoc Health\n\n**When:** Thu 2 Jul 2026 · **Who:** Marcus Reed (COO, economic buyer); likely Aisha Bello (CISO) · **Purpose:** Advance an early-stage expansion deal past compliance review · **Sources:** Teladoc Health (account), Security deep-dive + Intro call + Product demo (meetings), Marcus Reed + Aisha Bello (contacts)\n\n---\n\n## Bottom line\nTeladoc is an early-stage prospect (ARR $0, inbound via webinar) with real momentum: strong product interest, a fresh Series B, and budget likely available. The deal now hinges entirely on passing a rigorous security/compliance review. Your single job in this meeting is to clear the HIPAA and data-residency gate with proof — references and a compliance pack — not to sell harder.\n\n## Who you're meeting\n- **Marcus Reed — COO, economic buyer.** Analytical and skeptical; wants proof, references, and hard ROI answers. Reacts badly to hype.\n- **Aisha Bello — new CISO (hired May), deal blocker.** Rigorous on HIPAA and data residency; the gating factor. Likely present after pressing hard at the 20 Jun deep-dive.\n\n## What's changed since you last spoke\n- Closed a Series B (announced June) — budget is likely now available.\n- New CISO onboard, making the security review more demanding.\n- At the 20 Jun security deep-dive, the CISO pressed on data residency/HIPAA with multiple follow-ups; sentiment cooled to neutral.\n\n## Likely to come up\n- Data residency and HIPAA specifics — the central concern across every meeting.\n- The two healthcare references Marcus requested at intro.\n- ROI and proof points, framed without hype.\n\n## Your goals & talking points\n- **Clear compliance head-on:** open with concrete HIPAA and data-residency answers; deliver the compliance pack.\n- **Provide the references:** name the two healthcare customers Marcus asked for.\n- **Qualify budget authority:** confirm whether this meeting carries buying power or is still evaluation.\n\n## Watch-outs\n- Don't oversell — lead with evidence, not enthusiasm.\n- Don't hand-wave compliance; the CISO can stall the deal.\n\n## Desired outcome\nCompliance concerns satisfied enough to move to a commercial/budget conversation.",
+      "body_words": 286,
+      "retried": false,
+      "unresolved": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": {
+          "title": "Teladoc Health",
+          "url": "https://app.notion.com/p/Teladoc-Health-38cbf93e8ed88185a79dd43c11de035a"
+        },
+        "meetings": [
+          {
+            "title": "Teladoc Health — Intro call",
+            "url": "https://app.notion.com/p/Teladoc-Health-Intro-call-38cbf93e8ed88184803cff1a5d2466cc"
+          },
+          {
+            "title": "Teladoc Health — Product demo",
+            "url": "https://app.notion.com/p/Teladoc-Health-Product-demo-38cbf93e8ed8811ba543c820fa2b93ef"
+          },
+          {
+            "title": "Teladoc Health — Security deep-dive",
+            "url": "https://app.notion.com/p/Teladoc-Health-Security-deep-dive-38cbf93e8ed88194a487e012906fa74d"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "Marcus Reed",
+            "url": "https://app.notion.com/p/Marcus-Reed-38cbf93e8ed881099c75fc98aeac8f50"
+          },
+          {
+            "title": "Aisha Bello",
+            "url": "https://app.notion.com/p/Aisha-Bello-38cbf93e8ed88147b203c70d212658c9"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Teladoc Health'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "286 words"
+          ],
+          [
+            "not_unresolved",
+            true,
+            "unresolved=False"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim traces to the context: 2 Jul meeting, Marcus Reed (COO, economic buyer), Aisha Bello (CISO, blocker, hired May), ARR $0, webinar inbound, Series B announced June, 20 Jun deep-dive with neutral sentiment and CISO follow-ups, two healthcare references requested at intro, HIPAA/data-residency gating, no-hype/proof style. Sources line cites real pages. No fabrications detected.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the real situation: early-stage prospect with momentum gated by a rigorous compliance/security review, correctly identifies the meeting's job as clearing HIPAA/data-residency with references+compliance pack rather than selling, and surfaces the open budget-authority question. 'Likely Aisha Bello present' is a reasonable inference flagged as likely, not asserted.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident. No filler or flattery; leads with the bottom line and concrete actions, consistent with the account's no-hype preference.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "capitalone",
+      "input": "Capital One",
+      "kind": "account",
+      "note": "new / regulated",
+      "brief": "# Meeting Brief — Capital One (David Klein, Head of Digital)\n\n**When:** Tue 7 Jul 2026 · **Who:** David Klein, Head of Digital (decision-maker) · **Purpose:** Onboarding / pre-go-live check-in · **Sources:** Capital One (account); Onboarding kickoff, Security questionnaire, Contract close (meetings); David Klein, Olivia Grant (contacts)\n\n---\n\n## Bottom line\nCapital One is a new $2.1M account that signed in May, with July go-live phased across three business units. These first 90 days decide the relationship — David picked us and his reputation rides on a clean launch. Your one job here is to lock down a confident go-live: deliver the security docs the risk committee wants and over-communicate on support. Sell stability, not features.\n\n## Who you're meeting\n- **David Klein** — Head of Digital, decision-maker. Cautious, process-driven, risk-averse; wants predictability and clear SLAs. His internal credibility depends on this working.\n- **Watch in the background: Olivia Grant** — CISO, chairs the risk committee. A blocker who can stall go-live if unconvinced on SOC 2 and incident response.\n\n## What's changed since you last spoke\n- Go-live confirmed for July, rolling out to three business units through Q3.\n- Risk committee requested our latest SOC 2 and incident-response documentation (kickoff, 22 Jun).\n- Contract signed 15 May with phased rollout agreed; sentiment positive at close.\n\n## Likely to come up\n- Status of the security docs and whether they satisfy the risk committee.\n- Support model and SLAs for the early rollout phase.\n- Readiness and sequencing of the three-business-unit launch.\n\n## Your goals & talking points\n- **Clear the security gate:** confirm SOC 2 and incident-response docs are delivered; offer to walk Olivia's committee through them directly.\n- **Reassure on reliability:** spell out the support and escalation plan for go-live — predictability is what he's buying.\n- **Confirm rollout plan:** validate the phased sequence across the three units and name owners.\n\n## Watch-outs\n- Don't oversell new features — he wants stability first.\n- Any early reliability hiccup will be magnified; over-communicate rather than under.\n- Don't commit to timelines that depend on risk-committee sign-off you don't yet have.\n\n## Desired outcome\nLeave with security docs accepted and a confirmed, de-risked July go-live plan David trusts.",
+      "body_words": 321,
+      "retried": false,
+      "unresolved": false,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": {
+          "title": "Capital One",
+          "url": "https://app.notion.com/p/Capital-One-38cbf93e8ed881d280c8dc6fd772ca26"
+        },
+        "meetings": [
+          {
+            "title": "Capital One — Onboarding kickoff",
+            "url": "https://app.notion.com/p/Capital-One-Onboarding-kickoff-38cbf93e8ed8816388ebfe41bc8140f0"
+          },
+          {
+            "title": "Capital One — Security questionnaire",
+            "url": "https://app.notion.com/p/Capital-One-Security-questionnaire-38cbf93e8ed881b084a1cca7f27809a0"
+          },
+          {
+            "title": "Capital One — Contract close",
+            "url": "https://app.notion.com/p/Capital-One-Contract-close-38cbf93e8ed881ff845fe624ad6ba346"
+          }
+        ],
+        "contacts": [
+          {
+            "title": "David Klein",
+            "url": "https://app.notion.com/p/David-Klein-38cbf93e8ed881ceaf41c1f3fdd7b0d2"
+          },
+          {
+            "title": "Olivia Grant",
+            "url": "https://app.notion.com/p/Olivia-Grant-38cbf93e8ed88123a31eeef587a01908"
+          }
+        ]
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Capital One (David Klein, Head of Digital)'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "body_word_count_250_350",
+            true,
+            "321 words"
+          ],
+          [
+            "not_unresolved",
+            true,
+            "unresolved=False"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "Every claim traces to context: $2.1M ARR, New status, signed 15 May, July go-live phased across 3 business units, first-90-days framing, David Klein (Head of Digital, decision-maker, risk-averse, SLAs), Olivia Grant (CISO, risk committee chair, blocker on SOC 2/incident response), risk committee doc request from 22 Jun kickoff, positive close sentiment. Sources line cites real pages present in context. No invented specifics.",
+        "correctness": 5,
+        "correctness_reason": "Accurately captures the situation: new regulated buyer, critical onboarding window, security-gate as the central risk, Olivia as the latent blocker, stability-over-features posture. Talking points and watch-outs (clear security gate, reassure on reliability, don't oversell features, don't commit to timelines pending risk sign-off) are useful and faithful to the notes. The 7 Jul date matches Next Meeting 2026-07-07.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, confident; action-oriented ('Your one job here is to lock down a confident go-live'). No filler or flattery.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "zephyr_nonexistent",
+      "input": "Zephyr Corp",
+      "kind": "negative",
+      "note": "nonexistent account",
+      "brief": "# Meeting Brief — Zephyr Corp\n\n**When:** Unknown · **Who:** Unknown · **Purpose:** Unknown · **Sources:** no matching account found in Notion for \"Zephyr Corp\"\n\n---\n\n## Bottom line\nNo account named \"Zephyr Corp\" exists in the Notion CRM. A search returned only \"Target Corporation,\" which is a different company, so none of its details apply here. This brief cannot be completed from available data — confirm the correct account name or spelling before the meeting, and re-run.\n\n## Who you're meeting\n- Unknown — no Zephyr Corp account, contacts, or primary contact could be retrieved.\n\n## What's changed since you last spoke\n- Unknown — no meeting history is available for this account.\n\n## Likely to come up\n- Unknown — cannot anticipate an agenda without source material.\n\n## Your goals & talking points\n- **Confirm the account first:** verify the correct name (e.g. a parent company, subsidiary, or alternate spelling) so a real brief can be produced.\n\n## Watch-outs\n- Do not walk in assuming any facts — no verified information exists for this name.\n- Do not confuse this with \"Target Corporation,\" the only (non-matching) search result.\n\n## Desired outcome\nThe correct account is identified in Notion so an accurate brief can be prepared before the meeting.",
+      "body_words": 184,
+      "retried": false,
+      "unresolved": true,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-fetch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": {
+          "title": "Target Corporation",
+          "url": "https://app.notion.com/p/Target-Corporation-38cbf93e8ed88175b8adf8db0620efa5"
+        },
+        "meetings": [],
+        "contacts": []
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Zephyr Corp'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "is_unresolved",
+            true,
+            "unresolved=True"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "The brief invents no facts. It correctly states no 'Zephyr Corp' account exists, accurately notes the only search result was 'Target Corporation,' and explicitly refuses to apply Target's details. Every claim traces to the fetched context; the Sources line honestly reports no matching account.",
+        "correctness": 5,
+        "correctness_reason": "This is a negative case and the brief does exactly the right thing: it declines to brief a guessed account, marks When/Who/Purpose as Unknown, and explains it could not resolve 'Zephyr Corp.' It also guards against conflating it with Target Corporation and asks for name confirmation before re-running.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident. No filler or flattery; states the limitation clearly and gives an actionable next step.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    },
+    {
+      "id": "ambiguous_health",
+      "input": "Health",
+      "kind": "negative",
+      "note": "ambiguous (Teladoc Health vs HCA Healthcare)",
+      "brief": "# Meeting Brief — Health\n\n**When:** Unknown · **Who:** Unknown · **Purpose:** Unknown · **Sources:** ambiguous input — \"Health\" matched two accounts in Notion (HCA Healthcare, Teladoc Health); no single account could be resolved\n\n---\n\n## Bottom line\nThis brief could not be prepared. The input \"Health\" matches two different accounts in the CRM — **HCA Healthcare** and **Teladoc Health** — and there's no way to tell which meeting you mean. Rather than risk briefing you on the wrong company, nothing below has been filled in. Confirm which account you're meeting and I'll pull the full brief.\n\n## Who you're meeting\n- Unknown — account not resolved.\n\n## What's changed since you last spoke\n- Unknown — pending account selection.\n\n## Likely to come up\n- Unknown — pending account selection.\n\n## Your goals & talking points\n- **Disambiguate first:** tell me whether this is **HCA Healthcare** or **Teladoc Health** (or another account), and I'll gather contacts and recent meetings.\n\n## Watch-outs\n- Don't act on any detail here — no account data has been retrieved.\n\n## Desired outcome\nYou confirm the specific account so a fact-based brief can be produced before the meeting.",
+      "body_words": 159,
+      "retried": false,
+      "unresolved": true,
+      "tool_calls": [
+        "ToolSearch",
+        "mcp__brief_notion__notion-search"
+      ],
+      "wrote_to_notion": false,
+      "sources": {
+        "account": null,
+        "meetings": [],
+        "contacts": []
+      },
+      "programmatic": {
+        "checks": [
+          [
+            "title_first_line_no_preamble",
+            true,
+            "first line: '# Meeting Brief — Health'"
+          ],
+          [
+            "no_code_fences",
+            true,
+            "ok"
+          ],
+          [
+            "sections_in_order",
+            true,
+            "ok"
+          ],
+          [
+            "metadata_tokens",
+            true,
+            "ok"
+          ],
+          [
+            "sources_line",
+            true,
+            "ok"
+          ],
+          [
+            "is_unresolved",
+            true,
+            "unresolved=True"
+          ],
+          [
+            "must_appear",
+            true,
+            "ok"
+          ],
+          [
+            "must_not_appear",
+            true,
+            "ok"
+          ],
+          [
+            "safety_no_notion_writes",
+            true,
+            "ok"
+          ]
+        ],
+        "passed": true,
+        "safety_ok": true
+      },
+      "judge": {
+        "grounding": 5,
+        "grounding_reason": "The brief makes no factual claims about either account; it only names HCA Healthcare and Teladoc Health, both of which appear verbatim in the fetched search results. The Sources line accurately describes the ambiguity. Nothing invented.",
+        "correctness": 5,
+        "correctness_reason": "This is exactly the right behavior for the ambiguous case — it refuses to brief a guessed account, names both matching candidates, explains the input 'Health' could not be resolved, and asks for disambiguation. All Unknown fields are appropriately left blank.",
+        "tone": 5,
+        "tone_reason": "Plain, direct, and confident. No filler or flattery; clearly states it could not prepare the brief and what is needed to proceed.",
+        "fabrications": [],
+        "parse_ok": true,
+        "clean_json": true,
+        "passed": true
+      },
+      "overall_pass": true
+    }
+  ]
+}

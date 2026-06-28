@@ -11,25 +11,14 @@ tools (list/get), with every calendar AND Notion write tool hard-denied and non-
 auto-deny on — and it records every tool call so the caller can assert zero writes.
 """
 
-import json
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 
-from claude_agent_sdk import (
-    AssistantMessage,
-    ClaudeAgentOptions,
-    ResultMessage,
-    TextBlock,
-    ToolUseBlock,
-    query,
-)
-
-from .agent import (
-    CALENDAR_READ_TOOLS,
-    CALENDAR_WRITE_TOOLS,
-    NOTION_WRITE_TOOLS,
-    _result_error,
-)
+# Phase 7: the live day-fetch is now a direct, read-only Google Calendar read via a service
+# account (brief_agent/gcal.py) — no claude.ai connector, no model. Re-exported here so the CLI's
+# `from .calendar import fetch_day_events` keeps working. The evals never call it (they feed mocked
+# event JSON straight into `parse_events`, which stays a pure function).
+from .gcal import fetch_day_events  # noqa: F401  (re-exported)
 
 # Domain suffixes that mark a TEST attendee address (name@company.example.com) rather than a
 # real one. Stripped when deriving the company root from an email domain.
@@ -221,62 +210,6 @@ def resolve_date(spec: str | None, *, today: date) -> date:
     return date.fromisoformat(s)  # YYYY-MM-DD (raises on bad input — surfaced by the CLI)
 
 
-# --------------------------------------------------------------------------- #
-# Production fetch (agentic, read-only) — NOT used by the deterministic evals
-# --------------------------------------------------------------------------- #
-_FETCH_SYSTEM = """\
-You are a read-only calendar export tool. You call ONLY the calendar list/get tools to read
-events; you NEVER create, update, delete, or respond to events. Return data, nothing else."""
-
-_FETCH_TASK = """\
-List ALL events on the user's primary calendar for {day} (the entire day, local time), using
-the list_events tool with startTime "{day}T00:00:00" and endTime "{next_day}T00:00:00".
-
-Then output ONLY a JSON array (no prose, no code fences) where each element is:
-{{"id","summary","description","start","end","attendees","organizer","creator"}}
-copying these fields VERBATIM from each event (keep start/end as their full objects with
-dateTime/date and timeZone, and keep each attendee's displayName, email, self, organizer).
-TRUNCATE each "description" to its first ~300 characters (plain text only — drop any HTML,
-links, or boilerplate) so the JSON stays small and valid. If there are no events, output []."""
-
-
-def _extract_json_array(text: str) -> list[dict]:
-    t = text.strip()
-    if t.startswith("```"):
-        t = t.split("\n", 1)[1] if "\n" in t else t[3:]
-        if t.rstrip().endswith("```"):
-            t = t.rstrip()[:-3]
-    start, end = t.find("["), t.rfind("]")
-    if start == -1 or end == -1:
-        raise RuntimeError("Calendar fetch did not return a JSON array of events.")
-    return json.loads(t[start : end + 1])
-
-
-async def fetch_day_events(day: date, model: str) -> tuple[list[dict], list[str]]:
-    """Read a day's raw events via a read-only calendar agent.
-
-    Returns (raw_events, tool_calls). The caller asserts no write tool appears in tool_calls.
-    """
-    options = ClaudeAgentOptions(
-        system_prompt=_FETCH_SYSTEM,
-        model=model,
-        allowed_tools=CALENDAR_READ_TOOLS + ["ToolSearch"],
-        disallowed_tools=CALENDAR_WRITE_TOOLS + NOTION_WRITE_TOOLS + ["AskUserQuestion"],
-        permission_mode="dontAsk",
-        setting_sources=["user"],
-        max_turns=20,
-    )
-    task = _FETCH_TASK.format(day=day.isoformat(), next_day=(day + timedelta(days=1)).isoformat())
-    tool_calls: list[str] = []
-    texts: list[str] = []
-    async for message in query(prompt=task, options=options):
-        if isinstance(message, AssistantMessage):
-            for b in message.content:
-                if isinstance(b, ToolUseBlock):
-                    tool_calls.append(b.name)
-                elif isinstance(b, TextBlock):
-                    texts.append(b.text)
-        elif isinstance(message, ResultMessage) and message.is_error:
-            raise RuntimeError(f"Calendar fetch error: {_result_error(message)}")
-    raw = _extract_json_array("".join(texts))
-    return raw, tool_calls
+# The production day-fetch (`fetch_day_events`) lives in brief_agent/gcal.py — a direct, read-only
+# Google Calendar read via a service account — and is re-exported at the top of this module. The
+# deterministic evals never call it; they feed mocked event JSON straight into `parse_events`.
